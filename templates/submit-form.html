@@ -119,6 +119,34 @@
         }
 
         .captcha-refresh-btn:hover { border-color: #198754; color: #198754; }
+
+        /* File tags */
+        .file-list {
+            margin-top: 8px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            justify-content: center;
+        }
+
+        .file-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: #e8f5e9;
+            border: 1px solid #c8e6c9;
+            border-radius: 20px;
+            padding: 3px 10px;
+            font-size: 0.75rem;
+            color: #2e7d32;
+            max-width: 200px;
+        }
+
+        .file-tag span {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
     </style>
 </head>
 
@@ -154,7 +182,7 @@
 
             <form id="reportForm" enctype="multipart/form-data">
 
-                <!-- HONEYPOT: hidden from real users, bots fill it -->
+                <!-- HONEYPOT -->
                 <div style="position:absolute;left:-9999px;top:-9999px;opacity:0;height:0;overflow:hidden;" aria-hidden="true">
                     <input type="text" name="website" id="website" autocomplete="off" tabindex="-1">
                 </div>
@@ -189,13 +217,19 @@
 
                 <div class="dotted-form-box text-center" id="dropZone">
                     <i class="bi bi-cloud-upload fs-1" style="color: grey;"></i>
-                    <input type="file" id="fileInput" name="fileInput" hidden>
-                    <p class="mb-1">Drag & drop or click to upload file here</p>
-                    <p id="fileName" class="mt-2 small text-success"></p>
+
+                    <!-- multiple added -->
+                    <input type="file" id="fileInput" name="fileInput" multiple hidden>
+
+                    <p class="mb-1">Drag & drop or click to upload files here</p>
+
+                    <!-- selected file tags render here -->
+                    <div class="file-list" id="fileList"></div>
+
                     <p class="mt-3 mb-1 small text-muted">
                         Supported: TXT, Images (JPG, PNG, GIF, WebP), Videos (MP4, WebM, MOV), PDF
                     </p>
-                    <p class="small text-muted">Max size: 10MB</p>
+                    <p class="small text-muted">Max size: 10MB per file</p>
                 </div>
 
                 <!-- CAPTCHA -->
@@ -272,7 +306,6 @@
         const Captcha = (() => {
             let token    = null;
             let verified = false;
-
             const el = id => document.getElementById(id);
 
             function setStatus(msg, cls = "") {
@@ -286,7 +319,7 @@
                 el("captchaToken").value = "";
                 el("captchaX").value     = "";
                 el("captchaY").value     = "";
-                el("captchaImg").style.display    = "none";
+                el("captchaImg").style.display      = "none";
                 el("captchaSkeleton").style.display = "block";
                 el("captchaImgWrap").classList.remove("clicked");
                 el("captchaClickDot").style.display = "none";
@@ -295,10 +328,8 @@
                 try {
                     const res  = await fetch("/captcha/challenge");
                     const data = await res.json();
-
                     token = data.token;
                     el("captchaToken").value = data.token;
-
                     const img = el("captchaImg");
                     img.onload = () => {
                         el("captchaSkeleton").style.display = "none";
@@ -314,45 +345,75 @@
 
             function handleClick(e) {
                 if (verified) return;
-
                 const wrap   = el("captchaImgWrap");
                 const rect   = wrap.getBoundingClientRect();
-                const scaleX = 320 / rect.width;
-                const scaleY = 180 / rect.height;
-                const cx     = (e.clientX - rect.left) * scaleX;
-                const cy     = (e.clientY - rect.top)  * scaleY;
-
-                const dot = el("captchaClickDot");
+                const cx     = (e.clientX - rect.left) * (320 / rect.width);
+                const cy     = (e.clientY - rect.top)  * (180 / rect.height);
+                const dot    = el("captchaClickDot");
                 dot.style.left    = `${e.clientX - rect.left}px`;
                 dot.style.top     = `${e.clientY - rect.top}px`;
                 dot.style.display = "block";
-
                 wrap.classList.add("clicked");
-
-                // Store coords — real validation happens server-side on submit
                 verified = true;
                 el("captchaX").value = cx;
                 el("captchaY").value = cy;
                 setStatus("✓ Click recorded — submit when ready", "ok");
             }
 
-            // Expose public API
             return { load, handleClick, isVerified: () => verified };
         })();
 
-        // ── WIRE UP EVENTS (outside the module, after DOM is ready) ──────
+        // ── WIRE UP EVENTS ────────────────────────────────────────────────
         document.addEventListener("DOMContentLoaded", function () {
 
-            // Load CAPTCHA image on page ready
             Captcha.load();
 
-            // CAPTCHA image click
             document.getElementById("captchaImgWrap")
                 .addEventListener("click", Captcha.handleClick);
-
-            // Refresh button
             document.getElementById("captchaRefreshBtn")
                 .addEventListener("click", Captcha.load);
+
+            // ── FILE INPUT / DROP ZONE ────────────────────────────────────
+            const dropZone  = document.getElementById("dropZone");
+            const fileInput = document.getElementById("fileInput");
+            const fileList  = document.getElementById("fileList");
+
+            dropZone.addEventListener("click", () => fileInput.click());
+
+            fileInput.addEventListener("change", () => renderFileTags(fileInput.files));
+
+            dropZone.addEventListener("dragover", e => {
+                e.preventDefault();
+                dropZone.style.borderColor = "#198754";
+            });
+            dropZone.addEventListener("dragleave", () => {
+                dropZone.style.borderColor = "";
+            });
+            dropZone.addEventListener("drop", e => {
+                e.preventDefault();
+                dropZone.style.borderColor = "";
+                fileInput.files = e.dataTransfer.files;
+                renderFileTags(e.dataTransfer.files);
+            });
+
+            function getFileIcon(name) {
+                const ext = name.split(".").pop().toLowerCase();
+                if (["jpg","jpeg","png","gif","webp"].includes(ext)) return "bi-image";
+                if (["mp4","webm","mov"].includes(ext))              return "bi-camera-video";
+                if (ext === "pdf")                                    return "bi-file-earmark-pdf";
+                return "bi-file-earmark";
+            }
+
+            function renderFileTags(files) {
+                fileList.innerHTML = "";
+                if (!files || files.length === 0) return;
+                Array.from(files).forEach(f => {
+                    const tag = document.createElement("div");
+                    tag.className = "file-tag";
+                    tag.innerHTML = `<i class="bi ${getFileIcon(f.name)}"></i><span title="${f.name}">${f.name}</span>`;
+                    fileList.appendChild(tag);
+                });
+            }
 
             // ── FORM SUBMIT ───────────────────────────────────────────────
             const form = document.getElementById("reportForm");
@@ -361,13 +422,10 @@
             form.addEventListener("submit", function (e) {
                 e.preventDefault();
 
-                // 1. Honeypot check
-                if (document.getElementById("website").value) {
-                    // Silent drop — bots don't know they failed
-                    return;
-                }
+                // 1. Honeypot
+                if (document.getElementById("website").value) return;
 
-                // 2. CAPTCHA check
+                // 2. CAPTCHA
                 if (!Captcha.isVerified()) {
                     const s = document.getElementById("captchaStatus");
                     s.textContent = "⚠ Please complete the CAPTCHA first";
@@ -389,7 +447,7 @@
                         new bootstrap.Modal(document.getElementById("tracking-key")).show();
                     } else {
                         alert(data.error || "Submission failed. Please try again.");
-                        Captcha.load(); // reset CAPTCHA on failure
+                        Captcha.load();
                     }
                 })
                 .catch(err => console.error("Submit error:", err));
