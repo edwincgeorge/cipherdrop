@@ -43,5 +43,5 @@ def total_reports():
 def show_reports():
     db = get_db()
     return db.execute(
-        "SELECT tracking_id, title, status, filename, timestamp, category FROM reports"
+        "SELECT tracking_id, status, filename, timestamp, category FROM reports"
     ).fetchall()
