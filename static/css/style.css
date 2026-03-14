@@ -1,0 +1,351 @@
+@import url('https://fonts.googleapis.com/css2?family=Play:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Ramabhadra&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@100..900&display=swap');
+
+
+#loader {
+    position: fixed;
+    inset: 0;
+    background: #000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.g13 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 10vw;
+    font-weight: 900;
+    color: #fff;
+    position: relative;
+    letter-spacing: 6px;
+    animation: 1.5s infinite alternate;
+}
+
+.g13::before {
+    content: "G13";
+    position: absolute;
+    inset: 0;
+    color: #fff;
+    filter: blur(12px);
+    opacity: 0.5;
+}
+
+.hide-loader {
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.6s ease, visibility 0.6s ease;
+}
+
+.play-regular {
+    font-family: "Play", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+}
+
+.oswald {
+    font-family: "Ramabhadra", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+}
+
+.noto-sans-jp {
+    font-family: "Noto Sans JP", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
+}
+
+
+.encryption-section {
+    min-height: 63vh;
+}
+
+.encryption-badge {
+    background: rgba(200, 200, 200, 0.25);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    padding: 8px 24px;
+    border-radius: 50px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 1px;
+
+    color: #2c3e50;
+}
+
+.tagline {
+    font-family: "Ramabhadra";
+}
+
+.tagline-one {
+    font-size: 3rem;
+    font-weight: 600;
+}
+
+.tagline-two {
+    font-size: 3rem;
+    font-weight: 400;
+    color: #9e9f9f;
+}
+
+.hero-description {
+    max-width: 450px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 400;
+    line-height: 1.8;
+    color: #6c757d;
+}
+
+.btn-hp {
+    background-color: white;
+    color: black;
+    border: 1px solid black;
+    border-radius: 5px;
+
+    padding: 5px 14px;
+    /* smaller padding */
+    font-size: 0.85rem;
+    /* smaller text */
+    font-weight: 500;
+
+    font-family: 'Noto Sans JP', sans-serif;
+
+    transition: all 0.2s ease;
+}
+
+.btn-hp:hover {
+    background-color: black;
+    color: white;
+}
+
+.card-text {
+    font-size: 13px;
+    color: #6c757d;
+}
+
+.card-title {
+    padding: 11px 1px;
+}
+
+.custom-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(255, 255, 255, 0.05);
+    background-color: black;
+    color: white;
+    transition:
+        transform 0.4s ease,
+        box-shadow 0.4s ease,
+        background-color 0.6s ease,
+        color 0.4s ease;
+}
+
+.footer {
+    border-top: 1px solid #e0e0e0;   
+    margin-top: 80px;
+}
+
+.footer-text {
+    color: #9e9e9e;             
+    font-size: 0.9rem;
+    letter-spacing: 0.5px;
+}
+
+.form-section {
+    min-height: 80vh;
+}
+
+.form-box {
+    width: 100%;
+    max-width: 500px;
+    padding: 35px;
+
+    border: 2px solid #dcdcdc;    
+    border-radius: 18px;          
+
+    background-color: #fff;
+}
+.dotted-form-box {
+    width: 100%;
+    max-width: 500px;
+    padding: 35px;
+
+    border: 2px dashed #dcdcdc;    
+    border-radius: 18px;          
+
+    background-color: #fff;
+}
+
+.status-form-box {
+    width: 100%;
+    max-width: 500px;
+    padding: 30px;
+    border-radius: 20px;
+    border: 2px solid #22c55e;     
+
+    background-color: #f0fdf4;      
+}
+
+.lists{
+    margin-left: 23px;
+}
+
+.form-control {
+    border-radius: 8px;
+}
+
+.form-control:focus {
+    box-shadow: none;
+    border-color: #000;
+}
+
+.security-features {
+    font-size: 0.85rem;       
+    color: #6c757d;            
+}
+
+.feature-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 6px;       
+    line-height: 1.2;         
+}
+
+.tick {
+    color: #28a745;           
+    font-weight: bold;
+}
+
+.sec-tagline{
+    font-size: 1.0rem;
+    font-weight: bold;
+    color: black;
+}
+
+        .captcha-wrap {
+            margin-bottom: 1rem;
+        }
+
+        .captcha-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 14px;
+            background: #fafafa;
+        }
+
+        .captcha-label {
+            font-size: 0.78rem;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .captcha-prompt-text {
+            font-size: 0.88rem;
+            color: #333;
+            margin-bottom: 8px;
+            min-height: 20px;
+        }
+
+        .captcha-prompt-text strong {
+            color: #198754;
+            font-weight: 600;
+        }
+
+        .captcha-img-wrap {
+            position: relative;
+            width: 100%;
+            max-width: 320px;
+            height: 160px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1.5px solid #ddd;
+            cursor: crosshair;
+            background: #1a1a22;
+        }
+
+        .captcha-img-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none;
+            transition: filter 0.3s;
+        }
+
+        .captcha-img-wrap.clicked img {
+            filter: brightness(0.5);
+        }
+
+        .captcha-skeleton {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, #1a1a22 25%, #25252f 50%, #1a1a22 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.2s infinite;
+        }
+
+        @keyframes shimmer {
+            0%   { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        .captcha-click-dot {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 2px solid #fff;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            display: none;
+            animation: dotPop 0.2s ease;
+        }
+
+        @keyframes dotPop {
+            from { transform: translate(-50%, -50%) scale(0.2); opacity: 0; }
+            to   { transform: translate(-50%, -50%) scale(1);   opacity: 1; }
+        }
+
+        .captcha-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 8px;
+            gap: 8px;
+        }
+
+        .captcha-status {
+            font-size: 0.78rem;
+            color: #aaa;
+            flex: 1;
+        }
+
+        .captcha-status.ok  { color: #198754; font-weight: 500; }
+        .captcha-status.err { color: #dc3545; }
+
+        .captcha-refresh-btn {
+            background: none;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            color: #888;
+            font-size: 0.75rem;
+            padding: 3px 10px;
+            cursor: pointer;
+            transition: border-color 0.15s, color 0.15s;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .captcha-refresh-btn:hover {
+            border-color: #198754;
+            color: #198754;
+        }

@@ -1,0 +1,136 @@
+#loader {
+    position: fixed;
+    inset: 0;
+    background: #000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.g13 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 10vw;
+    font-weight: 900;
+    color: #fff;
+    position: relative;
+    letter-spacing: 6px;
+    animation: 1.5s infinite alternate;
+}
+
+.g13::before {
+    content: "G13";
+    position: absolute;
+    inset: 0;
+    color: #fff;
+    filter: blur(12px);
+    opacity: 0.5;
+}
+
+.hide-loader {
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.6s ease, visibility 0.6s ease;
+}
+
+.nav-btn {
+    background-color: rgb(223, 221, 221);
+    border: none;
+    border-radius: 5px;
+    height: 31px;
+
+}
+
+.nav-btn:hover {
+    background-color: rgb(0, 0, 0);
+    color: white;
+}
+
+.report-cards {
+    padding: 0px 50px;
+}
+
+.form-box {
+    padding: 15px;
+    border: 2px solid #dcdcdc;
+    border-radius: 18px;
+    background-color: #fff;
+
+    display: flex;
+    flex-direction: column;
+}
+
+.form-box>.d-flex {
+    width: 100%;
+}
+
+.report-data-box {
+    padding: 15px;
+    border: 2px solid #dcdcdc;
+    border-radius: 18px;
+    background-color: #fff;
+
+    display: flex;
+    flex-direction: column;
+}
+
+.table-head {
+    background-color: #eee9e9;
+}
+
+.ReportsChart {
+    height: 250px;
+}
+
+.reports-statics {
+    padding: 0px 60px;
+}
+
+.decrypt-btn {
+    border-radius: 5px;
+    height: 40px;
+
+}
+
+.decrypt-btn:hover {
+    background-color: rgb(0, 0, 0);
+    color: white;
+}
+
+.form-check-btn {
+    margin-left: 10px;
+}
+
+.submit-btn {
+    width: 100%;
+    height: 45px;
+    border-radius: 12px;
+    border: none;
+    background-color: #89b4f9;
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    color: #fff;
+    transition: all 0.2s ease;
+}
+
+.submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(137, 180, 249, 0.4);
+}
+
+.submit-btn:active {
+    transform: scale(0.98);
+}
+
+.footer {
+    border-top: 1px solid #e0e0e0;
+    margin-top: 150px;
+}
+
+.footer-text {
+    color: #9e9e9e;
+    font-size: 0.9rem;
+    letter-spacing: 0.5px;
+}
