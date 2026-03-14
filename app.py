@@ -18,8 +18,6 @@ captcha_bp = Blueprint("captcha", __name__)
 
 app = Flask(__name__)
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
-with app.app_context():
-    init_db()
 app.config['DATABASE'] = os.path.join(BASE_DIR, 'instance', 'database.db')
 
 UPLOAD_FOLDER = "static/uploads"
@@ -29,7 +27,8 @@ with open("public_key.pem", "rb") as f:
     public_key = RSA.import_key(f.read())
 
 rsa_cipher = PKCS1_OAEP.new(public_key)
-
+with app.app_context():
+    init_db()
 @app.route("/")
 def home():
     return render_template("index.html")
