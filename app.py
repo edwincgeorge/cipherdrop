@@ -17,7 +17,7 @@ from wa import send_whatsapp_text
 captcha_bp = Blueprint("captcha", __name__)
 
 app = Flask(__name__)
-
+app.config["DATABASE"] = "/tmp/database.db"
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
 app.config['DATABASE'] = os.path.join(BASE_DIR, 'instance', 'database.db')
