@@ -18,7 +18,8 @@ captcha_bp = Blueprint("captcha", __name__)
 
 app = Flask(__name__)
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
-
+with app.app_context():
+    init_db()
 app.config['DATABASE'] = os.path.join(BASE_DIR, 'instance', 'database.db')
 
 UPLOAD_FOLDER = "static/uploads"
