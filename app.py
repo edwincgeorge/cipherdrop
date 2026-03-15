@@ -132,9 +132,9 @@ def submit_report():
     import cloudinary.uploader
 
     cloudinary.config(
-        cloud_name=os.environ[""],
-        api_key=os.environ[""],
-        api_secret=os.environ[""]
+        cloud_name=os.environ["dnsju4pvn"],
+        api_key=os.environ["714295155129441"],
+        api_secret=os.environ["50LxfiIycpMez0Zo25aeYO9xsqM"]
     )
 
     files = request.files.getlist("fileInput")
