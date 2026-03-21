@@ -250,15 +250,17 @@
                         <div class="col">POSITION</div>
                         <div class="col text-end">ACTION</div>
                     </div>
+                    {% for admin in admins %}
                     <div class="row g-0 py-3 border-bottom align-items-center" style="font-size: 0.9rem;">
-                        <div class="col">#</div>
-                        <div class="col">name</div>
-                        <div class="col">email-id</div>
-                        <div class="col text-muted">position</div>
+                        <div class="col">{{admin.username}}</div>
+                        <div class="col">{{admin.name}}</div>
+                        <div class="col">{{admin.email}}</div>
+                        <div class="col text-muted">{{admin.position}}</div>
                         <div class="col text-end">
                             <button class="btn btn-sm btn-light border">delete</button>
                         </div>
                     </div>
+                    {% endfor %}
                 </div>
             </div>
     </section>
