@@ -1,4 +1,5 @@
 from db import get_db
+# ── Insert-reports-to-db ───────────────────────────────────────────────────
 
 def insert_reports(tracking_id, ciphertext, category, filename, timestamp, nonce, tag, enc_key):
     db = get_db()
@@ -6,6 +7,8 @@ def insert_reports(tracking_id, ciphertext, category, filename, timestamp, nonce
         INSERT INTO reports(tracking_id, encryptedtext, category, filename, timestamp, nonce, tag, enc_key, status, note)
         VALUES(?, ?, ?, ?, ?, ?, ?, ?, 'NEW', "No Note Created Yet")""",(tracking_id, ciphertext, category, filename, timestamp, nonce, tag, enc_key))
     db.commit()
+
+# ── tracking-id-verifier ───────────────────────────────────────────────────
 
 def tracking_id_exists(tracking_id):
     db = get_db()
@@ -15,14 +18,20 @@ def tracking_id_exists(tracking_id):
     ).fetchone()
     return result is not None
 
+# ── Fetch-all-reports ───────────────────────────────────────────────────
+
 def get_all_reports():
     db = get_db()
     rows = db.execute("SELECT * FROM reports").fetchall()
     return rows
 
+# ── Status-of-report ───────────────────────────────────────────────────
+
 def check_status(applicationID):
     db = get_db()
     return db.execute("SELECT status, note FROM reports WHERE tracking_id = ?", (applicationID,)).fetchone()
+
+# ── Status-counter ───────────────────────────────────────────────────
 
 def count_status():
     db = get_db()
@@ -32,6 +41,8 @@ def count_status():
     counts = {row[0] : row[1] for row in rows}
     return counts
 
+# ── total-report-fetch ───────────────────────────────────────────────────
+
 def total_reports():
     db = get_db()
     result = db.execute(
@@ -40,8 +51,35 @@ def total_reports():
 
     return result
 
+# ── display-all-report ───────────────────────────────────────────────────
+
 def show_reports():
     db = get_db()
     return db.execute(
         "SELECT tracking_id, status, filename, timestamp, category FROM reports"
+    ).fetchall()
+
+# ── Admin-management ───────────────────────────────────────────────────
+
+def admin_management(username, name, email, position, password_hash):
+    db = get_db()
+    db.execute(""" 
+            INSERT INTO admins(username, name, email, position, password_hash)
+            VALUES(?, ?, ?, ?, ?)""",(username, name, email, position, password_hash))
+    db.commit()
+
+# ── admin-verifier ───────────────────────────────────────────────────
+
+def get_admin(admin_username):
+    db = get_db()
+    return db.execute(
+        "SELECT username, name, email, position, password_hash FROM admins WHERE username = ?",(admin_username,)
+    ).fetchone()
+
+# ── Show-all-admins ───────────────────────────────────────────────────
+
+def show_admins():
+    db = get_db()
+    return db.execute(
+        "SELECT username, name, email, position FROM admins"
     ).fetchall()
