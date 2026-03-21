@@ -124,15 +124,25 @@ def admin():
     counts  = dbop.count_status()
     total   = dbop.total_reports()
     reports = dbop.show_reports()
+    admins = dbop.show_admins()
+    username = request.form.get()
+    name = request.form.get()
+    email = request.form.get()
+    position = request.form.get()
+    password = request.form.get()
+    hashed = generate_password_hash(password)
+
+    dbop.admin_management(username, name, email, position, hashed)
+
     return render_template(
         "admin.html",
         counts=counts,
         total=total,
         reports=reports,
+        admins = admins,
         admin_username=session.get("admin_username"),
         admin_role=session.get("admin_role")
     )
-
 
 # ── Debug route (remove in production) ───────────────────────────────────────
 
