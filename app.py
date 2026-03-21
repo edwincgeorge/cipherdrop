@@ -98,10 +98,16 @@ def login_submit():
     username = request.form.get("username", "").strip()
     password = request.form.get("password", "")
 
-    admin = dbop.get_admin_by_username(username)
+    admin = dbop.get_admin(username)
     if not admin or not check_password_hash(admin["password_hash"], password):
         return jsonify({"success": False, "error": "Invalid credentials"}), 401
 
+    # 3. Set session
+    session["admin_logged_in"] = True
+    session["admin_username"]  = admin["username"]
+    session["admin_role"]      = admin["position"]
+
+    return jsonify({"success": True, "redirect": "/admin"})
     # 3. Set session
     session["admin_logged_in"] = True
     session["admin_username"]  = admin["username"]
