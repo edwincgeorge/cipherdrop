@@ -30,7 +30,8 @@ def init_db():
                tag TEXT,
                enc_key TEXT,
                status TEXT NOT NULL,
-               note TEXT
+               note TEXT,
+               tx_signature TEXT DEFAULT NULL
                )
 """)
     
