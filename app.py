@@ -255,6 +255,7 @@ def submit_report():
     })
 
     dbop.insert_reports(tracking_id, ciphertext, category, filename, timestamp, nonce, tag, enc_key)
+    dbop.inr_admins()
 
     # ── blockchain──────────────────────────────────────────────────────────────
 
