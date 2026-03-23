@@ -1,4 +1,5 @@
 from db import get_db
+from werkzeug.security import generate_password_hash
 # ── Insert-reports-to-db ───────────────────────────────────────────────────
 
 def insert_reports(tracking_id, ciphertext, category, filename, timestamp, nonce, tag, enc_key):
