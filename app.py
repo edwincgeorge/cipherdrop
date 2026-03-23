@@ -15,6 +15,7 @@ import db_operations as dbop
 import config as vf
 from wa import send_whatsapp_text
 from functools import wraps
+from blockchain import store_hash_on_chain
 
 captcha_bp = Blueprint("captcha", __name__)
 
@@ -256,7 +257,27 @@ def submit_report():
 
     dbop.insert_reports(tracking_id, ciphertext, category, filename, timestamp, nonce, tag, enc_key)
 
+    # ── blockchain──────────────────────────────────────────────────────────────
+
+    chain_result = store_hash_on_chain(tracking_id, timestamp)
+ 
+    if chain_result["success"]:
+        
+        dbop.update_tx_signature(tracking_id, chain_result["tx_signature"])
+        print(f"[blockchain] Hash stored: {chain_result['explorer_url']}")
+    else:
+        
+        print(f"[blockchain] Hash storage failed (non-critical): {chain_result.get('error')}")
+ 
+    return jsonify({
+        "success":      True,
+        "tracking_id":  tracking_id,
+        "tx_signature": chain_result.get("tx_signature"),   
+        "explorer_url": chain_result.get("explorer_url"),
+    })
+
     return jsonify({"success": True, "tracking_id": tracking_id})
+
 
 
 # ── Status check ──────────────────────────────────────────────────────────────
