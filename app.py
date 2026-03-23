@@ -152,6 +152,22 @@ def admin():
         admin_role=session.get("admin_role")
     )
 
+@app.route("/add-admin" , methods=["POST"])
+def add_admin():
+    username = request.form.get("admin-username")
+    name = request.form.get("admin-name")
+    email = request.form.get("admin-email")
+    position = request.form.get("admin-position")
+    password = request.form.get("admin-password")
+
+    if not password:
+      return jsonify({"success": False, "error": "Password is required"}), 400
+
+    dbop.admin_management(username, name, email, position, password)
+    return jsonify({
+            "success": True
+        })
+
 # ── Debug route (remove in production) ───────────────────────────────────────
 
 @app.route("/check-db")
