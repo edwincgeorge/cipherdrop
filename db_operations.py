@@ -104,7 +104,8 @@ def show_admins():
 
 def inr_admins():
     db = get_db()
-    return     INSERT OR IGNORE INTO admins (username, name, email, position, password_hash)
+    return db.execute("""
+    INSERT OR IGNORE INTO admins (username, name, email, position, password_hash)
     VALUES (?, ?, ?, ?, ?)
 """, (
     "admin",
