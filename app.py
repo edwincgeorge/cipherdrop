@@ -15,8 +15,8 @@ import db_operations as dbop
 import config as vf
 from wa import send_whatsapp_text
 from functools import wraps
-from blockchain import store_hash_on_chain
-from werkzeug.security import generate_password_hash
+import cloudinary
+import cloudinary.uploader
 
 captcha_bp = Blueprint("captcha", __name__)
 
@@ -110,12 +110,6 @@ def login_submit():
     session["admin_role"]      = admin["position"]
 
     return jsonify({"success": True, "redirect": "/admin"})
-    # 3. Set session
-    session["admin_logged_in"] = True
-    session["admin_username"]  = admin["username"]
-    session["admin_role"]      = admin["role"]
-
-    return jsonify({"success": True, "redirect": "/admin"})
 
 
 @app.route("/logout")
@@ -127,7 +121,6 @@ def logout():
 # ── Admin dashboard (protected) ───────────────────────────────────────────────
 
 @app.route("/admin")
-@login_required
 def admin():
     counts  = dbop.count_status()
     total   = dbop.total_reports()
@@ -160,11 +153,70 @@ def add_admin():
             "success": True
         })
 
+@app.route('/get-report', methods=['POST'])
+def get_report():
+    tracking_id = request.form.get('tracking_id')
+    secret_code = request.form.get('secret_code')
+
+    print(f"Looking for tracking_id: '{tracking_id}'")
+
+    report = dbop.get_report_by_id(tracking_id)
+
+    if not report:
+        return jsonify({'success': False, 'message': 'Report not found'})
+
+    report = dict(report)
+
+    try:
+        # Load private key using the secret_code as passphrase
+        with open("private_key.pem", "rb") as f:
+            private_key = RSA.import_key(f.read(), passphrase=secret_code.encode())
+
+        rsa_decipher = PKCS1_OAEP.new(private_key)
+
+        # Decode stored base64 fields
+        enc_key    = base64.b64decode(report['enc_key'])
+        ciphertext = base64.b64decode(report['ciphertext'])
+        nonce      = base64.b64decode(report['nonce'])
+        tag        = base64.b64decode(report['tag'])
+
+        # Decrypt AES key with RSA private key
+        report_key = rsa_decipher.decrypt(enc_key)
+
+        # Decrypt report data with AES
+        cipher = AES.new(report_key, AES.MODE_GCM, nonce=nonce)
+        plaintext = cipher.decrypt_and_verify(ciphertext, tag)
+
+        data = json.loads(plaintext.decode())
+
+        return jsonify({
+            'success': True,
+            'title':       data.get('title', 'N/A'),
+            'category':    report.get('category', 'N/A'),
+            'description': data.get('description', 'N/A'),
+            'evidence':    report.get('filename', 'N/A'),
+            'status':      report.get('status', 'N/A')
+        })
+
+    except (ValueError, KeyError) as e:
+        print(f"Decryption error: {e}")
+        return jsonify({'success': False, 'message': 'Invalid secret code or corrupted data'})
+
+@app.route('/update-report', methods=['POST'])
+def update_report():
+    tracking_id = request.form.get('tracking_id')
+    status      = request.form.get('status')
+    note        = request.form.get('note')
+
+    dbop.update_report_status(tracking_id, status, note)
+    return jsonify({'success': True})
+
 # ── Debug route (remove in production) ───────────────────────────────────────
 
 @app.route("/check-db")
+@login_required
 def view_reports():
-    reports = dbop.get_all_admins()
+    reports = dbop.get_all_reports()
     return str([dict(r) for r in reports])
 
 
@@ -230,10 +282,6 @@ def submit_report():
     tracking_id = generate_unique_tracking_id()
     timestamp   = datetime.now().strftime("%Y-%m-%d")
 
-    # 3. Upload files to Cloudinary
-    import cloudinary
-    import cloudinary.uploader
-
     cloudinary.config(
         cloud_name=os.environ["CLOUDINARY_CLOUD_NAME"],
         api_key=os.environ["CLOUDINARY_API_KEY"],
@@ -264,29 +312,8 @@ def submit_report():
     })
 
     dbop.insert_reports(tracking_id, ciphertext, category, filename, timestamp, nonce, tag, enc_key)
-    dbop.inr_admins()
-
-    # ── blockchain──────────────────────────────────────────────────────────────
-
-    chain_result = store_hash_on_chain(tracking_id, timestamp)
- 
-    if chain_result["success"]:
-        
-        dbop.update_tx_signature(tracking_id, chain_result["tx_signature"])
-        print(f"[blockchain] Hash stored: {chain_result['explorer_url']}")
-    else:
-        
-        print(f"[blockchain] Hash storage failed (non-critical): {chain_result.get('error')}")
- 
-    return jsonify({
-        "success":      True,
-        "tracking_id":  tracking_id,
-        "tx_signature": chain_result.get("tx_signature"),   
-        "explorer_url": chain_result.get("explorer_url"),
-    })
 
     return jsonify({"success": True, "tracking_id": tracking_id})
-
 
 
 # ── Status check ──────────────────────────────────────────────────────────────
