@@ -115,3 +115,27 @@ def inr_admins():
     "superadmin",
     generate_password_hash("changeme123")
 ))
+
+
+# ── delete-admins ───────────────────────────────────────────────────
+
+def admin_delete(username):
+    db = get_db()
+    db.execute("""
+        DELETE FROM admins WHERE username = ? """, (username,))
+    db.commit()
+
+def get_report_by_id(tracking_id):
+    db = get_db()
+    report = db.execute(
+        "SELECT * FROM reports WHERE tracking_id = ?", (tracking_id,)
+    ).fetchone()
+    return report
+
+def update_report_status(tracking_id, status, note):
+    db = get_db()
+    db.execute(
+        "UPDATE reports SET status = ?, note = ? WHERE tracking_id = ?",
+        (status, note, tracking_id)
+    )
+    db.commit()
