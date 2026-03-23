@@ -41,6 +41,17 @@ def count_status():
     counts = {row[0] : row[1] for row in rows}
     return counts
 
+# ── Blockchain ───────────────────────────────────────────────────
+
+def update_tx_signature(tracking_id, tx_signature):
+    db = get_db()
+    db.execute(
+        "UPDATE reports SET tx_signature = ? WHERE tracking_id = ?",
+        (tx_signature, tracking_id)
+    )
+    db.commit()
+ 
+
 # ── total-report-fetch ───────────────────────────────────────────────────
 
 def total_reports():
