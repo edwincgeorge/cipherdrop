@@ -133,14 +133,6 @@ def admin():
     total   = dbop.total_reports()
     reports = dbop.show_reports()
     admins = dbop.show_admins()
-    username = request.form.get('username')
-    name = request.form.get('name')
-    email = request.form.get('email')
-    position = request.form.get('position')
-    password = request.form.get('password')
-    hashed = generate_password_hash(password)
-
-    dbop.admin_management(username, name, email, position, hashed)
 
     return render_template(
         "admin.html",
