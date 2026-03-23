@@ -155,7 +155,7 @@ def admin():
 
 @app.route("/check-db")
 def view_reports():
-    reports = dbop.get_all_reports()
+    reports = dbop.get_all_admins()
     return str([dict(r) for r in reports])
 
 
