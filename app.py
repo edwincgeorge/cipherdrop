@@ -154,7 +154,6 @@ def admin():
 # ── Debug route (remove in production) ───────────────────────────────────────
 
 @app.route("/check-db")
-@login_required
 def view_reports():
     reports = dbop.get_all_reports()
     return str([dict(r) for r in reports])
