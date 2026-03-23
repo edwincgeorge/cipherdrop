@@ -16,6 +16,7 @@ import config as vf
 from wa import send_whatsapp_text
 from functools import wraps
 from blockchain import store_hash_on_chain
+from werkzeug.security import generate_password_hash
 
 captcha_bp = Blueprint("captcha", __name__)
 
