@@ -1,4 +1,5 @@
 import sqlite3
+from werkzeug.security import generate_password_hash
 from flask import current_app, g
 
 def get_db():
@@ -30,11 +31,13 @@ def init_db():
                tag TEXT,
                enc_key TEXT,
                status TEXT NOT NULL,
-               note TEXT,
-               tx_signature TEXT DEFAULT NULL
+               note TEXT
                )
 """)
     
+    db.execute("""
+               ALTER TABLE reports ADD COLUMN tx_signature TEXT DEFAULT NULL;)
+    """)
 
     db.execute("""
         CREATE TABLE IF NOT EXISTS admins (
@@ -46,4 +49,9 @@ def init_db():
             password_hash TEXT NOT NULL
         )
     """)
+
+    db.execute("""
+    INSERT OR IGNORE INTO admins (username, name, email, position, password_hash)
+    VALUES (?, ?, ?, ?, ?)""", ("admin", "Super Admin", "admin@cipherdrop.com", "superadmin", generate_password_hash("changeme123")
+    ))
     db.commit
