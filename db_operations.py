@@ -106,5 +106,5 @@ def inr_admins():
     db = get_db()
     return db.execute("""
     INSERT INTO admins (username, name, email, position, password_hash)
-    VALUES ("admin", "Super Admin", "admin@cipherdrop.com", "superadmin", ?)""", ( generate_password_hash("changeme123")
+    VALUES ("admin123", "Super Admin", "admin@cipherdrop.com", "superadmin", ?)""", ( generate_password_hash("changeme123")
     ))
