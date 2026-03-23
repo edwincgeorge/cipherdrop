@@ -24,6 +24,12 @@ def get_all_reports():
     db = get_db()
     rows = db.execute("SELECT * FROM reports").fetchall()
     return rows
+    
+def get_all_admins():
+    db = get_db()
+    rows = db.execute("SELECT * FROM admins").fetchall()
+    return rows
+
 
 # ── Status-of-report ───────────────────────────────────────────────────
 
