@@ -156,36 +156,52 @@ def add_admin():
 @app.route('/get-report', methods=['POST'])
 def get_report():
     tracking_id = request.form.get('tracking_id')
-    private_key_file = request.files.get('private_key')  # ✅ get uploaded .pem
+    private_key_file = request.files.get('private_key')
+
+    print(f"=== GET REPORT ===")
+    print(f"tracking_id: {tracking_id}")
+    print(f"private_key_file: {private_key_file}")
 
     if not private_key_file:
         return jsonify({'success': False, 'message': 'No private key uploaded'})
 
     report = dbop.get_report_by_id(tracking_id)
+    print(f"report found: {report is not None}")
+
     if not report:
         return jsonify({'success': False, 'message': 'Report not found'})
 
     report = dict(report)
+    print(f"report keys: {list(report.keys())}")  # ← shows actual column names
 
     try:
-        # ✅ Read the uploaded private key directly from memory — never saved to disk
         private_key_data = private_key_file.read()
+        print(f"key size: {len(private_key_data)} bytes")
+
         private_key = RSA.import_key(private_key_data)
+        print("✅ RSA key loaded")
+
         rsa_decipher = PKCS1_OAEP.new(private_key)
 
         enc_key    = base64.b64decode(report['enc_key'])
+        print("✅ enc_key decoded")
+
         ciphertext = base64.b64decode(report['encryptedtext'])
+        print("✅ ciphertext decoded")
+
         nonce      = base64.b64decode(report['nonce'])
         tag        = base64.b64decode(report['tag'])
+        print("✅ nonce and tag decoded")
 
-        # Decrypt AES key with RSA private key
         report_key = rsa_decipher.decrypt(enc_key)
+        print("✅ RSA decrypt done")
 
-        # Decrypt report with AES-GCM
         cipher = AES.new(report_key, AES.MODE_GCM, nonce=nonce)
         plaintext = cipher.decrypt_and_verify(ciphertext, tag)
+        print("✅ AES decrypt done")
 
         data = json.loads(plaintext.decode())
+        print(f"✅ JSON parsed: {list(data.keys())}")
 
         return jsonify({
             'success': True,
@@ -197,8 +213,10 @@ def get_report():
         })
 
     except Exception as e:
-        print(f"Decryption error: {type(e).__name__}: {e}")
-        return jsonify({'success': False, 'message': 'Wrong private key or corrupted data'})
+        print(f"❌ ERROR at: {type(e).__name__}: {e}")
+        import traceback
+        traceback.print_exc()  # ← full stack trace
+        return jsonify({'success': False, 'message': f'{type(e).__name__}: {str(e)}'})
 
 @app.route('/update-report', methods=['POST'])
 def update_report():
