@@ -156,25 +156,23 @@ def add_admin():
 @app.route('/get-report', methods=['POST'])
 def get_report():
     tracking_id = request.form.get('tracking_id')
-    secret_code = request.form.get('secret_code')
+    private_key_file = request.files.get('private_key')  # ✅ get uploaded .pem
 
-    print(f"Looking for tracking_id: '{tracking_id}'")
+    if not private_key_file:
+        return jsonify({'success': False, 'message': 'No private key uploaded'})
 
     report = dbop.get_report_by_id(tracking_id)
-
     if not report:
         return jsonify({'success': False, 'message': 'Report not found'})
 
     report = dict(report)
 
     try:
-        # Load private key using the secret_code as passphrase
-        with open("private_key.pem", "rb") as f:
-            private_key = RSA.import_key(f.read(), passphrase=secret_code.encode())
-
+        # ✅ Read the uploaded private key directly from memory — never saved to disk
+        private_key_data = private_key_file.read()
+        private_key = RSA.import_key(private_key_data)
         rsa_decipher = PKCS1_OAEP.new(private_key)
 
-        # Decode stored base64 fields
         enc_key    = base64.b64decode(report['enc_key'])
         ciphertext = base64.b64decode(report['encryptedtext'])
         nonce      = base64.b64decode(report['nonce'])
@@ -183,7 +181,7 @@ def get_report():
         # Decrypt AES key with RSA private key
         report_key = rsa_decipher.decrypt(enc_key)
 
-        # Decrypt report data with AES
+        # Decrypt report with AES-GCM
         cipher = AES.new(report_key, AES.MODE_GCM, nonce=nonce)
         plaintext = cipher.decrypt_and_verify(ciphertext, tag)
 
@@ -200,7 +198,7 @@ def get_report():
 
     except Exception as e:
         print(f"Decryption error: {type(e).__name__}: {e}")
-        return jsonify({'success': False, 'message': f'Invalid secret code: {str(e)}'})
+        return jsonify({'success': False, 'message': 'Wrong private key or corrupted data'})
 
 @app.route('/update-report', methods=['POST'])
 def update_report():
