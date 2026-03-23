@@ -176,7 +176,7 @@ def get_report():
 
         # Decode stored base64 fields
         enc_key    = base64.b64decode(report['enc_key'])
-        ciphertext = base64.b64decode(report['ciphertext'])
+        ciphertext = base64.b64decode(report['encryptedtext'])
         nonce      = base64.b64decode(report['nonce'])
         tag        = base64.b64decode(report['tag'])
 
@@ -198,9 +198,9 @@ def get_report():
             'status':      report.get('status', 'N/A')
         })
 
-    except (ValueError, KeyError) as e:
-        print(f"Decryption error: {e}")
-        return jsonify({'success': False, 'message': 'Invalid secret code or corrupted data'})
+    except Exception as e:
+        print(f"Decryption error: {type(e).__name__}: {e}")
+        return jsonify({'success': False, 'message': f'Invalid secret code: {str(e)}'})
 
 @app.route('/update-report', methods=['POST'])
 def update_report():
