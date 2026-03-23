@@ -466,99 +466,112 @@
             });
 
         });
+        document.addEventListener("DOMContentLoaded", function () {
 
-        document.getElementById('decrypt-submit-btn').addEventListener('click', function () {
-            const fileInput = document.getElementById('secret-code-input');
-            const file = fileInput.files[0];
+            let currentTrackingId = null;  // ✅ declared once, accessible everywhere below
 
-            if (!file) {
-                alert('Please upload your private key (.pem file)');
-                return;
-            }
+            // ── View button clicked → store tracking ID ───────────────────────────
+            document.querySelectorAll('.view-btn').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    currentTrackingId = this.dataset.trackingId;
+                    document.getElementById('modal-tracking-id').textContent = currentTrackingId;
+                    document.getElementById('secret-code-input').value = '';
+                });
+            });
 
-            this.textContent = 'Decrypting...';
-            this.disabled = true;
-            const btn = this;
+            // ── Decrypt button clicked → upload key and fetch report ──────────────
+            document.getElementById('decrypt-submit-btn').addEventListener('click', function () {
+                const fileInput = document.getElementById('secret-code-input');
+                const file = fileInput.files[0];
 
-            // ✅ Send as FormData so the file is included
-            const formData = new FormData();
-            formData.append('tracking_id', currentTrackingId);
-            formData.append('private_key', file);  // ← send the .pem file
+                if (!file) {
+                    alert('Please upload your private key (.pem file)');
+                    return;
+                }
 
-            fetch('/get-report', {
-                method: 'POST',
-                body: formData  // ← no Content-Type header needed for FormData
-            })
-                .then(res => res.json())
-                .then(data => {
-                    btn.textContent = 'Decrypt Report';
-                    btn.disabled = false;
-                    fileInput.value = ''; // ← clear file input after use
+                this.textContent = 'Decrypting...';
+                this.disabled = true;
+                const btn = this;
 
-                    if (!data.success) {
-                        alert('Error: ' + data.message);
-                        return;
-                    }
+                const formData = new FormData();
+                formData.append('tracking_id', currentTrackingId);
+                formData.append('private_key', file);
 
-                    // Fill modal fields
-                    document.getElementById('modal-report-id').textContent = currentTrackingId;
-                    document.querySelector('[data-field="title"]').textContent = data.title;
-                    document.querySelector('[data-field="category"]').textContent = data.category;
-                    document.querySelector('[data-field="description"]').textContent = data.description;
-
-                    const evidenceEl = document.querySelector('[data-field="evidence"]');
-                    if (data.evidence && data.evidence.startsWith('http')) {
-                        const urls = data.evidence.split(',');
-                        evidenceEl.innerHTML = urls.map(url => {
-                            const isImage = /\.(jpg|jpeg|png|gif|webp)$/i.test(url);
-                            return isImage
-                                ? `<img src="${url}" class="img-fluid rounded mb-2" style="max-height:200px;">`
-                                : `<a href="${url}" target="_blank" class="btn btn-sm btn-outline-secondary mb-1">View File</a>`;
-                        }).join('');
-                    } else {
-                        evidenceEl.textContent = data.evidence || 'No evidence provided';
-                    }
-
-                    // Close first modal, open second
-                    const decryptModal = bootstrap.Modal.getInstance(document.getElementById('decryptModal'));
-                    decryptModal.hide();
-                    document.getElementById('decryptModal').addEventListener('hidden.bs.modal', function () {
-                        new bootstrap.Modal(document.getElementById('reportDecryptedModal')).show();
-                    }, { once: true });
+                fetch('/get-report', {
+                    method: 'POST',
+                    body: formData
                 })
-                .catch(err => {
-                    btn.textContent = 'Decrypt Report';
-                    btn.disabled = false;
-                    alert('Something went wrong.');
-                    console.error(err);
-                });
-        });
+                    .then(res => res.json())
+                    .then(data => {
+                        btn.textContent = 'Decrypt Report';
+                        btn.disabled = false;
+                        fileInput.value = '';
 
-        // ── Step 3: Submit note + status update ───────────────────────────────
-        document.getElementById('update-report-btn').addEventListener('click', function () {
-            const note = document.getElementById('descInput').value.trim();
-            const status = document.querySelector('input[name="reportStatus"]:checked');
+                        if (!data.success) {
+                            alert('Error: ' + data.message);
+                            return;
+                        }
 
-            if (!status) {
-                alert('Please select a status');
-                return;
-            }
+                        // Fill second modal fields
+                        document.getElementById('modal-report-id').textContent = currentTrackingId;
+                        document.querySelector('[data-field="title"]').textContent = data.title;
+                        document.querySelector('[data-field="category"]').textContent = data.category;
+                        document.querySelector('[data-field="description"]').textContent = data.description;
 
-            fetch('/update-report', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: `tracking_id=${encodeURIComponent(currentTrackingId)}&status=${encodeURIComponent(status.value)}&note=${encodeURIComponent(note)}`
-            })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success) {
-                        alert('Report updated successfully');
-                        bootstrap.Modal.getInstance(document.getElementById('reportDecryptedModal')).hide();
-                        location.reload(); // refresh counts and table
-                    } else {
-                        alert('Error: ' + data.message);
-                    }
-                });
+                        const evidenceEl = document.querySelector('[data-field="evidence"]');
+                        if (data.evidence && data.evidence.startsWith('http')) {
+                            const urls = data.evidence.split(',');
+                            evidenceEl.innerHTML = urls.map(url => {
+                                const isImage = /\.(jpg|jpeg|png|gif|webp)$/i.test(url);
+                                return isImage
+                                    ? `<img src="${url}" class="img-fluid rounded mb-2" style="max-height:200px;">`
+                                    : `<a href="${url}" target="_blank" class="btn btn-sm btn-outline-secondary mb-1">View File</a>`;
+                            }).join('');
+                        } else {
+                            evidenceEl.textContent = data.evidence || 'No evidence provided';
+                        }
+
+                        // Close first modal, then open second
+                        const decryptModal = bootstrap.Modal.getInstance(document.getElementById('decryptModal'));
+                        decryptModal.hide();
+                        document.getElementById('decryptModal').addEventListener('hidden.bs.modal', function () {
+                            new bootstrap.Modal(document.getElementById('reportDecryptedModal')).show();
+                        }, { once: true });
+                    })
+                    .catch(err => {
+                        btn.textContent = 'Decrypt Report';
+                        btn.disabled = false;
+                        alert('Something went wrong.');
+                        console.error(err);
+                    });
+            });
+
+            // ── Submit note + status update ───────────────────────────────────────
+            document.getElementById('update-report-btn').addEventListener('click', function () {
+                const note = document.getElementById('descInput').value.trim();
+                const status = document.querySelector('input[name="reportStatus"]:checked');
+
+                if (!status) {
+                    alert('Please select a status');
+                    return;
+                }
+
+                fetch('/update-report', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: `tracking_id=${encodeURIComponent(currentTrackingId)}&status=${encodeURIComponent(status.value)}&note=${encodeURIComponent(note)}`
+                })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert('Report updated successfully');
+                            bootstrap.Modal.getInstance(document.getElementById('reportDecryptedModal')).hide();
+                            location.reload();
+                        } else {
+                            alert('Error: ' + data.message);
+                        }
+                    });
+            });
 
             // ── Add admin form ────────────────────────────────────────────────────
             const form = document.getElementById("admin-form");
@@ -568,13 +581,17 @@
                     fetch("/add-admin", { method: "POST", body: new FormData(form) })
                         .then(r => r.json())
                         .then(data => {
-                            if (data.success) { alert("Admin added successfully"); form.reset(); }
-                            else alert("Error: " + data.message);
+                            if (data.success) {
+                                alert("Admin added successfully");
+                                form.reset();
+                            } else {
+                                alert("Error: " + data.message);
+                            }
                         });
                 });
             }
 
-        });
+        }); 
     </script>
 
 </body>
