@@ -47,8 +47,4 @@ def init_db():
         )
     """)
 
-    db.execute("""
-    INSERT INTO admins (username, name, email, position, password_hash)
-    VALUES ("admin", "Super Admin", "admin@cipherdrop.com", "superadmin", ?)""", ( generate_password_hash("changeme123")
-    ))
     db.commit
