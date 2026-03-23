@@ -208,8 +208,8 @@
                     <div class="col">{{ report.timestamp }}</div>
                     <!-- View button opens the decrypt modal -->
                     <div class="col text-end">
-                        <button class="btn btn-sm btn-light border" data-bs-toggle="modal"
-                            data-bs-target="#decryptModal">View</button>
+                        <button class="btn btn-sm btn-light border view-btn" data-bs-toggle="modal"
+                            data-tracking-id="{{ report.tracking_id }}" data-bs-target="#decryptModal">View</button>
                     </div>
                 </div>
                 {% endfor %}
@@ -297,10 +297,8 @@
                 <div class="modal-body pt-0">
                     <!-- Shows tracking ID of the report being decrypted -->
                     <p class="text-muted small mb-3">
-                        {% for report in reports %}
                         Enter the secret code to decrypt report
-                        <strong>{{ report.tracking_id }}</strong>
-                        {% endfor %}
+                        <strong id="modal-tracking-id"></strong>
                     </p>
                     <label class="form-label fw-semibold">Secret Code</label>
                     <input type="text" maxlength="15" class="form-control custom-input"
@@ -321,40 +319,37 @@
             <div class="modal-content rounded-4">
                 <div class="modal-header border-0">
                     <h5 class="modal-title fw-bold">
-                        Report of <strong>{reportid}</strong>
+                        Report of <strong id="modal-report-id"></strong> <!-- ← changed -->
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
 
-                    <!-- Decrypted report fields -->
                     <div class="mb-3 d-flex">
                         <label class="fw-semibold me-2">Title:</label>
-                        <p class="mb-0">{title}</p>
+                        <p class="mb-0" data-field="title"></p> <!-- ← changed -->
                     </div>
                     <div class="mb-3 d-flex">
                         <label class="fw-semibold me-2">Category:</label>
-                        <p class="mb-0">{Category}</p>
+                        <p class="mb-0" data-field="category"></p> <!-- ← changed -->
                     </div>
                     <div class="mb-3">
                         <label class="fw-semibold">Description:</label>
-                        <p class="mb-0 ps-3">{Description}</p>
+                        <p class="mb-0 ps-3" data-field="description"></p> <!-- ← changed -->
                     </div>
                     <div class="mb-3">
                         <label class="fw-semibold">Evidence:</label>
-                        <div class="ps-3">{Evidence}</div>
+                        <div class="ps-3" data-field="evidence"></div> <!-- ← changed -->
                     </div>
 
                     <hr>
 
-                    <!-- Admin note textarea -->
                     <div class="mb-3">
                         <label class="fw-semibold">Add a note:</label>
                         <textarea class="form-control" rows="4" maxlength="2000" id="descInput"
                             placeholder="Add a note to the issue"></textarea>
                     </div>
 
-                    <!-- Radio buttons to update report status -->
                     <div>
                         <label class="fw-semibold mb-2">Set report status:</label>
                         <div class="row g-2">
@@ -366,7 +361,7 @@
                                 </div>
                             </div>
                             <div class="col-3">
-                                <div class="form-check-btn p-2 rounded bg-purple-subtle" style="background:#f3e8ff;">
+                                <div class="form-check-btn p-2 rounded" style="background:#f3e8ff;">
                                     <input class="form-check-input" type="radio" name="reportStatus" id="statusReviewed"
                                         value="Reviewed">
                                     <label class="form-check-label fw-semibold" for="statusReviewed">Reviewed</label>
@@ -389,9 +384,8 @@
                         </div>
                     </div>
 
-                    <!-- Submit button to save note and status -->
                     <div class="mt-4">
-                        <button class="submit-btn">Submit</button>
+                        <button class="submit-btn" id="update-report-btn">Submit</button>
                     </div>
 
                 </div>
@@ -472,6 +466,129 @@
                         }
                     });
             });
+
+        });
+
+        document.addEventListener("DOMContentLoaded", function () {
+
+            let currentTrackingId = null;
+
+            // ── Step 1: View button clicked → store tracking ID ──────────────────
+            document.querySelectorAll('.view-btn').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    currentTrackingId = this.dataset.trackingId;
+                    document.getElementById('modal-tracking-id').textContent = currentTrackingId;
+                    document.getElementById('secret-code-input').value = '';
+                });
+            });
+
+            // ── Step 2: Decrypt button clicked → fetch from Flask ─────────────────
+            document.getElementById('decrypt-submit-btn').addEventListener('click', function () {
+                const secretCode = document.getElementById('secret-code-input').value.trim();
+
+                if (!secretCode) {
+                    alert('Please enter the secret code');
+                    return;
+                }
+
+                // Show loading state
+                this.textContent = 'Decrypting...';
+                this.disabled = true;
+                const btn = this;
+
+                fetch('/get-report', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: `tracking_id=${encodeURIComponent(currentTrackingId)}&secret_code=${encodeURIComponent(secretCode)}`
+                })
+                    .then(res => res.json())
+                    .then(data => {
+                        btn.textContent = 'Decrypt Report';
+                        btn.disabled = false;
+
+                        if (!data.success) {
+                            alert('Error: ' + data.message);
+                            return;
+                        }
+
+                        // ✅ Fill the second modal with decrypted data
+                        document.getElementById('modal-report-id').textContent = currentTrackingId;
+                        document.querySelector('[data-field="title"]').textContent = data.title;
+                        document.querySelector('[data-field="category"]').textContent = data.category;
+                        document.querySelector('[data-field="description"]').textContent = data.description;
+
+                        // Evidence - show as image/link if it's a URL
+                        const evidenceEl = document.querySelector('[data-field="evidence"]');
+                        if (data.evidence && data.evidence.startsWith('http')) {
+                            const urls = data.evidence.split(',');
+                            evidenceEl.innerHTML = urls.map(url => {
+                                const isImage = /\.(jpg|jpeg|png|gif|webp)$/i.test(url);
+                                if (isImage) {
+                                    return `<img src="${url}" class="img-fluid rounded mb-2" style="max-height:200px;">`;
+                                } else {
+                                    return `<a href="${url}" target="_blank" class="btn btn-sm btn-outline-secondary mb-1">View File</a>`;
+                                }
+                            }).join('');
+                        } else {
+                            evidenceEl.textContent = data.evidence || 'No evidence provided';
+                        }
+
+                        // ✅ Close first modal, then open second
+                        const decryptModal = bootstrap.Modal.getInstance(document.getElementById('decryptModal'));
+                        decryptModal.hide();
+
+                        document.getElementById('decryptModal').addEventListener('hidden.bs.modal', function () {
+                            new bootstrap.Modal(document.getElementById('reportDecryptedModal')).show();
+                        }, { once: true });
+                    })
+                    .catch(err => {
+                        btn.textContent = 'Decrypt Report';
+                        btn.disabled = false;
+                        alert('Something went wrong. Please try again.');
+                        console.error(err);
+                    });
+            });
+
+            // ── Step 3: Submit note + status update ───────────────────────────────
+            document.getElementById('update-report-btn').addEventListener('click', function () {
+                const note = document.getElementById('descInput').value.trim();
+                const status = document.querySelector('input[name="reportStatus"]:checked');
+
+                if (!status) {
+                    alert('Please select a status');
+                    return;
+                }
+
+                fetch('/update-report', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: `tracking_id=${encodeURIComponent(currentTrackingId)}&status=${encodeURIComponent(status.value)}&note=${encodeURIComponent(note)}`
+                })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert('Report updated successfully');
+                            bootstrap.Modal.getInstance(document.getElementById('reportDecryptedModal')).hide();
+                            location.reload(); // refresh counts and table
+                        } else {
+                            alert('Error: ' + data.message);
+                        }
+                    });
+            });
+
+            // ── Add admin form ────────────────────────────────────────────────────
+            const form = document.getElementById("admin-form");
+            if (form) {
+                form.addEventListener("submit", function (e) {
+                    e.preventDefault();
+                    fetch("/add-admin", { method: "POST", body: new FormData(form) })
+                        .then(r => r.json())
+                        .then(data => {
+                            if (data.success) { alert("Admin added successfully"); form.reset(); }
+                            else alert("Error: " + data.message);
+                        });
+                });
+            }
 
         });
     </script>
