@@ -6,43 +6,57 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ottikodukal</title>
 
+    <!-- Google Fonts - Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
+    <!-- Bootstrap CSS - layout and components -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
+    <!-- Bootstrap Icons - icon set -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 
+    <!-- Bootstrap JS - for modals, dropdowns, etc. -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
+    <!-- Select2 CSS - styled dropdown/select inputs -->
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 
+    <!-- Custom admin styles -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/admin-style.css') }}">
 </head>
 
-<body>
+<body id="admin">
 
+    <!-- jQuery - required by Select2 -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
+    <!-- Select2 JS - enhanced select boxes -->
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
+    <!-- Chart.js - for pie chart and line graph -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
+    <!-- Custom JS logic -->
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 
+    <!-- Full-screen loading spinner shown on page load -->
     <div id="loader">
         <div class="g13">G13</div>
     </div>
 
+    <!-- Top navigation bar with brand name, download backup button, and admin dropdown -->
     <nav class="navbar navbar-light bg-white shadow-sm">
         <div class="container-fluid px-3">
             <a class="navbar-brand fw-bold" href="index.html" style="font-family: Play;">Cipherdrop</a>
 
             <div class="d-flex align-items-center gap-2">
 
+                <!-- Backup download button - hidden on small screens -->
                 <button class="nav-btn btn btn-outline-dark btn-sm d-none d-sm-block">
                     Download Backup
                 </button>
 
+                <!-- Admin profile dropdown with profile and logout links -->
                 <div class="dropdown">
                     <button class="nav-btn btn btn-sm dropdown-toggle d-flex align-items-center"
                         data-bs-toggle="dropdown">
@@ -56,6 +70,7 @@
                             <hr class="dropdown-divider">
                         </li>
                         <li><a class="dropdown-item text-danger" href="#">Logout</a></li>
+                        <!-- Download Backup also shown here on mobile -->
                         <li class="d-block d-sm-none"><a class="dropdown-item" href="#">Download Backup</a></li>
                     </ul>
                 </div>
@@ -63,123 +78,115 @@
         </div>
     </nav>
 
+    <!-- Summary cards showing counts: New, Closed, Failed, Reviewed, Total reports -->
     <div class="report-cards container-fluid mt-5">
         <div class="row row-cols-2 row-cols-lg-5 g-3">
+
+            <!-- New reports card -->
             <div class="col">
                 <div class="form-box">
                     <div class="d-flex align-items-center justify-content-between">
-
                         <p class="text-muted mb-0">New reports</p>
-
                         <div class="d-flex justify-content-center align-items-center"
                             style="border-radius: 50%; background-color: rgb(219, 234, 254); width: 40px; height: 40px; flex-shrink: 0;">
                             <i class="bi bi-file-earmark-text" style="line-height: 0; color:rgb(21, 93, 252);"></i>
                         </div>
-
                     </div>
-                    <h2>
-                        {{ counts.get('NEW', 0) }}
-                    </h2>
+                    <!-- Count from Flask backend -->
+                    <h2>{{ counts.get('NEW', 0) }}</h2>
                     <div class="mt-"
                         style="width: 100%; height: 6px; background-color: rgb(21, 93, 252); border-radius: 10px;">
                     </div>
                 </div>
             </div>
+
+            <!-- Closed reports card -->
             <div class="col">
                 <div class="form-box">
                     <div class="d-flex align-items-center justify-content-between">
-
                         <p class="text-muted mb-0">Closed reports</p>
-
                         <div class="d-flex justify-content-center align-items-center"
                             style="border-radius: 50%; background-color: rgb(219, 252, 231); width: 40px; height: 40px; flex-shrink: 0;">
                             <i class="bi bi-file-earmark-text" style="line-height: 0; color:rgb(2, 167, 63);"></i>
                         </div>
-
                     </div>
-                    <h2>
-                        {{ counts.get('CLOSED', 0) }}
-                    </h2>
+                    <h2>{{ counts.get('CLOSED', 0) }}</h2>
                     <div class="mt-"
                         style="width: 100%; height: 6px; background-color: rgb(2, 167, 63); border-radius: 10px;"></div>
                 </div>
             </div>
+
+            <!-- Failed reports card -->
             <div class="col">
                 <div class="form-box">
                     <div class="d-flex align-items-center justify-content-between">
-
                         <p class="text-muted mb-0">Failed reports</p>
-
                         <div class="d-flex justify-content-center align-items-center"
                             style="border-radius: 50%; background-color: rgb(255, 226, 226); width: 40px; height: 40px; flex-shrink: 0;">
                             <i class="bi bi-file-earmark-text" style="line-height: 0; color:rgb(236, 42, 50);"></i>
                         </div>
-
                     </div>
-                    <h2>
-                        {{ counts.get('FAILED', 0) }}
-                    </h2>
+                    <h2>{{ counts.get('FAILED', 0) }}</h2>
                     <div class="mt-"
                         style="width: 100%; height: 6px; background-color:rgb(236, 42, 50); border-radius: 10px;"></div>
                 </div>
             </div>
+
+            <!-- Reviewed reports card -->
             <div class="col">
                 <div class="form-box">
                     <div class="d-flex align-items-center justify-content-between">
-
                         <p class="text-muted mb-0">Reviewed reports</p>
-
                         <div class="d-flex justify-content-center align-items-center"
                             style="border-radius: 50%; background-color: rgb(243, 232, 255); width: 40px; height: 40px; flex-shrink: 0;">
                             <i class="bi bi-file-earmark-text" style="line-height: 0; color:rgb(173, 70, 255);"></i>
                         </div>
-
                     </div>
-                    <h2>
-                        {{ counts.get('OPENED', 0) }}
-                    </h2>
+                    <h2>{{ counts.get('OPENED', 0) }}</h2>
                     <div class="mt-"
                         style="width: 100%; height: 6px; background-color: rgb(173, 70, 255); border-radius: 10px;">
                     </div>
                 </div>
             </div>
+
+            <!-- Total reports card -->
             <div class="col">
                 <div class="form-box">
                     <div class="d-flex align-items-center justify-content-between">
-
                         <p class="text-muted mb-0">Total reports</p>
-
                         <div class="d-flex justify-content-center align-items-center"
                             style="border-radius: 50%; background-color: rgb(243, 244, 246); width: 40px; height: 40px; flex-shrink: 0;">
                             <i class="bi bi-file-earmark-text" style="line-height: 0; color:rgb(153, 161, 175);"></i>
                         </div>
-
                     </div>
-                    <h2>
-                        {{ total }}
-                    </h2>
+                    <h2>{{ total }}</h2>
                     <div class="mt-"
                         style="width: 100%; height: 6px; background-color: rgb(153, 161, 175); border-radius: 10px;">
                     </div>
                 </div>
             </div>
+
         </div>
     </div>
 
+    <!-- Reports table with search bar - lists all reports from Flask -->
     <section style="padding: 50px;">
         <div class="report-data-box">
             <div class="d-flex align-items-center justify-content-between">
-
                 <h5 class=" mb-0">Reports</h5>
 
+                <!-- Search input and button -->
                 <div class="d-flex justify-content-center align-items-center">
                     <input type="search" id="site-search" class="form-control" placeholder="Search..."
                         aria-label="Search">
                     <button class="btn btn-primary" type="submit" id="button-search" style="margin-left: 10px;">
-                        <i class="bi bi-search"></i> </button>
+                        <i class="bi bi-search"></i>
+                    </button>
                 </div>
             </div>
             <hr class="border text-muted border-1 opacity-75 rounded">
+
+            <!-- Table header row -->
             <div class="container-fluid" style="padding: 0px 25px;">
                 <div class="row g-0 py-2 border-bottom align-items-center text-muted fw-bold"
                     style="font-size: 0.75rem; letter-spacing: 0.5px;">
@@ -191,13 +198,15 @@
                     <div class="col text-end">ACTION</div>
                 </div>
 
+                <!-- Loop through each report and render a row -->
                 {% for report in reports %}
                 <div class="row gx-3 py-3 border-bottom align-items-center" style="font-size:0.9rem;">
                     <div class="col">{{ report.tracking_id }}</div>
-                    <div class="col">Unavailable</div>
+                    <div class="col">Unavailable</div> <!-- Title is encrypted, shown as unavailable -->
                     <div class="col" style="width: 20px;">{{ report.category }}</div>
                     <div class="col">{{ report.status }}</div>
                     <div class="col">{{ report.timestamp }}</div>
+                    <!-- View button opens the decrypt modal -->
                     <div class="col text-end">
                         <button class="btn btn-sm btn-light border" data-bs-toggle="modal"
                             data-bs-target="#decryptModal">View</button>
@@ -208,23 +217,25 @@
         </div>
     </section>
 
+    <!-- Charts section - pie chart and bar/line graph side by side -->
     <section>
         <div class="reports-statics container-fluid">
             <div class="row gx-4 gy-4">
+
+                <!-- Pie chart showing report status distribution -->
                 <div class="col-md-6">
                     <div class="report-data-box">
                         <h5>Repots status distribution</h5>
                         <div class="ReportsChart">
                             <canvas id="ReportsPieChart"></canvas>
                         </div>
-
                     </div>
                 </div>
+
+                <!-- Line/bar graph showing reports submitted per day for last 7 days -->
                 <div class="col-md-6">
                     <div class="report-data-box">
-                        <h5>
-                            Reports per day (Last 7 days)
-                        </h5>
+                        <h5>Reports per day (Last 7 days)</h5>
                         <div class="ReportsChart">
                             <canvas id="ReportsGraphChart"></canvas>
                         </div>
@@ -232,15 +243,22 @@
                 </div>
 
             </div>
-
         </div>
     </section>
 
+    <!-- Admin management table - lists all admins, with option to add new one -->
     <section style="padding: 50px;">
         <div class="container-fluid mt-2">
             <div class="report-data-box">
-                <h5 class=" mb-0">Administration</h5>
+                <div class="d-flex justify-content-between align-items-center mb-0">
+                    <h5 class="mb-0">Administration</h5>
+                    <!-- Button opens the Add Admin modal -->
+                    <button class="btn btn-sm btn-light border" data-bs-toggle="modal" data-bs-target="#add-admin">Add
+                        an admin</button>
+                </div>
                 <hr class="border text-muted border-1 opacity-75 rounded">
+
+                <!-- Admin table header -->
                 <div class="container-fluid" style="padding: 0px 25px;">
                     <div class="row g-0 py-2 border-bottom align-items-center text-muted fw-bold"
                         style="font-size: 0.75rem; letter-spacing: 0.5px;">
@@ -250,12 +268,15 @@
                         <div class="col">POSITION</div>
                         <div class="col text-end">ACTION</div>
                     </div>
+
+                    <!-- Loop through each admin and render a row -->
                     {% for admin in admins %}
                     <div class="row g-0 py-3 border-bottom align-items-center" style="font-size: 0.9rem;">
                         <div class="col">{{admin.username}}</div>
                         <div class="col">{{admin.name}}</div>
                         <div class="col">{{admin.email}}</div>
                         <div class="col text-muted">{{admin.position}}</div>
+                        <!-- Delete button to remove admin (functionality not yet wired) -->
                         <div class="col text-end">
                             <button class="btn btn-sm btn-light border">delete</button>
                         </div>
@@ -264,64 +285,61 @@
                 </div>
             </div>
     </section>
+
+    <!-- Modal: Step 1 - Admin enters secret code to decrypt a report -->
     <div class="modal fade" id="decryptModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content custom-modal">
-
                 <div class="modal-header border-0">
                     <h5 class="modal-title fw-bold">Decrypt Report</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-
                 <div class="modal-body pt-0">
+                    <!-- Shows tracking ID of the report being decrypted -->
                     <p class="text-muted small mb-3">
                         {% for report in reports %}
                         Enter the secret code to decrypt report
                         <strong>{{ report.tracking_id }}</strong>
                         {% endfor %}
                     </p>
-
                     <label class="form-label fw-semibold">Secret Code</label>
                     <input type="text" maxlength="15" class="form-control custom-input"
                         placeholder="Enter secret code...">
+                    <!-- On click, closes this modal and opens the decrypted report modal -->
                     <button class="decrypt-btn btn decrypt-btn w-100 mt-4" data-bs-toggle="modal"
                         data-bs-target="#reportDecryptedModal">
                         Decrypt Report
                     </button>
                 </div>
-
             </div>
         </div>
     </div>
+
+    <!-- Modal: Step 2 - Shows decrypted report content and lets admin update status/add notes -->
     <div class="modal fade" id="reportDecryptedModal" tabindex="-1">
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content rounded-4">
-
                 <div class="modal-header border-0">
                     <h5 class="modal-title fw-bold">
                         Report of <strong>{reportid}</strong>
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-
                 <div class="modal-body">
 
-                    <!-- Report Details -->
+                    <!-- Decrypted report fields -->
                     <div class="mb-3 d-flex">
                         <label class="fw-semibold me-2">Title:</label>
                         <p class="mb-0">{title}</p>
                     </div>
-
                     <div class="mb-3 d-flex">
                         <label class="fw-semibold me-2">Category:</label>
                         <p class="mb-0">{Category}</p>
                     </div>
-
                     <div class="mb-3">
                         <label class="fw-semibold">Description:</label>
                         <p class="mb-0 ps-3">{Description}</p>
                     </div>
-
                     <div class="mb-3">
                         <label class="fw-semibold">Evidence:</label>
                         <div class="ps-3">{Evidence}</div>
@@ -329,79 +347,133 @@
 
                     <hr>
 
-                    <!-- Add Note -->
+                    <!-- Admin note textarea -->
                     <div class="mb-3">
                         <label class="fw-semibold">Add a note:</label>
                         <textarea class="form-control" rows="4" maxlength="2000" id="descInput"
                             placeholder="Add a note to the issue"></textarea>
                     </div>
 
-                    <!-- Status Selection -->
+                    <!-- Radio buttons to update report status -->
                     <div>
                         <label class="fw-semibold mb-2">Set report status:</label>
-
                         <div class="row g-2">
-
                             <div class="col-3">
                                 <div class="form-check-btn p-2 rounded bg-primary-subtle">
                                     <input class="form-check-input" type="radio" name="reportStatus" id="statusOpened"
                                         value="Opened">
-                                    <label class="form-check-label fw-semibold" for="statusOpened">
-                                        Opened
-                                    </label>
+                                    <label class="form-check-label fw-semibold" for="statusOpened">Opened</label>
                                 </div>
                             </div>
-
                             <div class="col-3">
                                 <div class="form-check-btn p-2 rounded bg-purple-subtle" style="background:#f3e8ff;">
                                     <input class="form-check-input" type="radio" name="reportStatus" id="statusReviewed"
                                         value="Reviewed">
-                                    <label class="form-check-label fw-semibold" for="statusReviewed">
-                                        Reviewed
-                                    </label>
+                                    <label class="form-check-label fw-semibold" for="statusReviewed">Reviewed</label>
                                 </div>
                             </div>
-
                             <div class="col-3">
                                 <div class="form-check-btn p-2 rounded bg-danger-subtle">
                                     <input class="form-check-input" type="radio" name="reportStatus" id="statusFailed"
                                         value="Failed">
-                                    <label class="form-check-label fw-semibold" for="statusFailed">
-                                        Failed
-                                    </label>
+                                    <label class="form-check-label fw-semibold" for="statusFailed">Failed</label>
                                 </div>
                             </div>
-
                             <div class="col-3">
                                 <div class="form-check-btn p-2 rounded bg-success-subtle">
                                     <input class="form-check-input" type="radio" name="reportStatus" id="statusClosed"
                                         value="Closed">
-                                    <label class="form-check-label fw-semibold" for="statusClosed">
-                                        Closed
-                                    </label>
+                                    <label class="form-check-label fw-semibold" for="statusClosed">Closed</label>
                                 </div>
                             </div>
-
                         </div>
                     </div>
+
+                    <!-- Submit button to save note and status -->
                     <div class="mt-4">
                         <button class="submit-btn">Submit</button>
                     </div>
 
                 </div>
-
             </div>
         </div>
     </div>
+
+    <!-- Modal: Add New Admin form -->
+    <div class="modal fade" id="add-admin" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content custom-modal">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title fw-bold">Add New Admin</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="admin-form" enctype="multipart/form-data">
+                    <div class="modal-body pt-0">
+
+                        <label class="form-label fw-semibold">username</label>
+                        <input type="text" name="admin-username" required maxlength="15"
+                            class="form-control custom-input" placeholder="Enter username...">
+
+                        <label class="form-label fw-semibold">name</label>
+                        <input type="text" name="admin-name" required maxlength="15" class="form-control custom-input"
+                            placeholder="Enter name...">
+
+                        <label class="form-label fw-semibold">email</label>
+                        <input type="email" name="admin-email" required class="form-control custom-input"
+                            placeholder="Enter email...">
+
+                        <label class="form-label fw-semibold">position</label>
+                        <input type="text" name="admin-position" required class="form-control custom-input"
+                            placeholder="Enter position...">
+
+                        <label class="form-label fw-semibold">password</label>
+                        <input type="password" name="admin-password" required class="form-control custom-input"
+                            placeholder="Enter password...">
+
+                        <button type="submit" class="btn decrypt-btn w-100 mt-4">
+                            Add
+                        </button>
+
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
     <footer class="footer text-center py-4">
         <div class="container">
-            <p class="mb-0 footer-text">
-                Developed by G13
-            </p>
+            <p class="mb-0 footer-text">Developed by G13</p>
         </div>
     </footer>
 
     <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const form = document.getElementById("admin-form");
+            if (!form) return;
+
+            form.addEventListener("submit", function (e) {
+                e.preventDefault();
+
+                let formData = new FormData(form);
+
+                fetch("/add-admin", {
+                    method: "POST",
+                    body: formData
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert("Admin added successfully");
+                            form.reset();
+                        } else {
+                            alert("Error: " + data.message);
+                        }
+                    });
+            });
+
+        });
     </script>
 
 </body>
