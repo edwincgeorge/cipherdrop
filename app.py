@@ -17,6 +17,7 @@ from wa import send_whatsapp_text
 from functools import wraps
 import cloudinary
 import cloudinary.uploader
+from blockchain import store_hash_on_chain
 
 captcha_bp = Blueprint("captcha", __name__)
 
@@ -328,6 +329,22 @@ def submit_report():
     })
 
     dbop.insert_reports(tracking_id, ciphertext, category, filename, timestamp, nonce, tag, enc_key)
+    chain_result = store_hash_on_chain(tracking_id, timestamp)
+ 
+    if chain_result["success"]:
+        # Save the transaction signature in DB for later verification
+        dbop.update_tx_signature(tracking_id, chain_result["tx_signature"])
+        print(f"[blockchain] Hash stored: {chain_result['explorer_url']}")
+    else:
+        # Blockchain failure does NOT stop the submission
+        print(f"[blockchain] Hash storage failed (non-critical): {chain_result.get('error')}")
+ 
+    return jsonify({
+        "success":      True,
+        "tracking_id":  tracking_id,
+        "tx_signature": chain_result.get("tx_signature"),   # optional, show to user
+        "explorer_url": chain_result.get("explorer_url"),   # optional
+    })
 
     return jsonify({"success": True, "tracking_id": tracking_id})
 
