@@ -7,17 +7,36 @@
     <title>Ottikodukal</title>
 
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+        /* Particle canvas sits behind everything */
+        #particleCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* Ensure all page content sits above the canvas */
+        body > *:not(#particleCanvas) {
+            position: relative;
+            z-index: 1;
+        }
+    </style>
 </head>
 
 <body>
+
+    <!-- Particle Background Canvas -->
+    <canvas id="particleCanvas"></canvas>
 
     <div id="loader">
         <div class="g13">G13</div>
@@ -40,6 +59,7 @@
             </div>
         </div>
     </nav>
+
     <section class="encryption-section d-flex flex-column justify-content-center align-items-center text-center">
         <div class="encryption-badge mb-4">
             END-TO-END ENCRYPTED
@@ -51,13 +71,14 @@
         </div>
         <p class="hero-description mt-3 ">
             Built on zero-knowledge architecture and powered by client-side encryption.
-            Your identity is never stored. Privacy isn’t a feature — it’s the foundation of everything we build.
+            Your identity is never stored. Privacy isn't a feature — it's the foundation of everything we build.
         </p>
         <div class="d-flex gap-2">
             <button class="btn-hp" onclick="window.location.href='{{ url_for('submit') }}'">Submit report</button>
             <button class="btn-hp" onclick="window.location.href='{{ url_for('status') }}'">Check status</button>
         </div>
     </section>
+
     <section class="cards-section d-flex justify-content-center">
         <div class="container">
             <div class="row justify-content-center g-4">
@@ -103,7 +124,6 @@
         </div>
     </section>
 
-
     <footer class="footer text-center py-4">
         <div class="container">
             <p class="mb-0 footer-text">
@@ -114,6 +134,199 @@
 
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 
-</body>
+    <script>
+        // ── Particle Background ──────────────────────────────────────────────────
+        class Particle {
+            constructor(canvas, ctx, options = {}) {
+                this.canvas = canvas;
+                this.ctx = ctx;
+                this.x = options.x ?? Math.random() * canvas.width;
+                this.y = options.y ?? Math.random() * canvas.height;
+                this.size = options.size ?? (0.5 + Math.random() * 2);
+                this.baseSize = this.size;
+                this.speedX = options.speedX ?? (Math.random() - 0.5) * 0.3;
+                this.speedY = options.speedY ?? (Math.random() - 0.5) * 0.3;
+                this.color = options.color ?? this.getRandomColor();
+                this.alpha = options.alpha ?? (0.4 + Math.random() * 0.6);
+                this.isNode = options.isNode ?? (Math.random() > 0.97);
+                this.nodeConnections = [];
+                this.orbitSpeed = Math.random() * 0.01 + 0.005;
+                this.orbitAngle = Math.random() * Math.PI * 2;
+                this.orbitRadius = 0;
+                this.pulseSpeed = 0.03 + Math.random() * 0.04;
+                this.pulseDirection = 1;
 
+                if (this.isNode) {
+                    this.size = 3 + Math.random() * 4;
+                    this.orbitRadius = 15 + Math.random() * 25;
+                    this.speedX = (Math.random() - 0.5) * 0.1;
+                    this.speedY = (Math.random() - 0.5) * 0.1;
+                }
+            }
+
+            getRandomColor() {
+                // Neutral, subtle palette — works on both light & dark backgrounds
+                const colors = ['#6c8ebf', '#7b9fd4', '#a0b8d8', '#8fa8c8', '#b0c4de'];
+                return colors[Math.floor(Math.random() * colors.length)];
+            }
+
+            draw() {
+                this.ctx.beginPath();
+                this.ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                this.ctx.fillStyle = this.color;
+                this.ctx.globalAlpha = this.alpha;
+                this.ctx.fill();
+
+                if (this.isNode) this.drawOrbiters();
+                if (this.isNode && this.nodeConnections.length > 0) this.drawConnections();
+
+                this.ctx.globalAlpha = 1;
+            }
+
+            drawOrbiters() {
+                const orbiters = 2 + Math.floor(Math.random() * 3);
+                for (let i = 0; i < orbiters; i++) {
+                    const angle = this.orbitAngle + (Math.PI * 2 / orbiters) * i;
+                    const x = this.x + Math.cos(angle) * this.orbitRadius;
+                    const y = this.y + Math.sin(angle) * this.orbitRadius;
+                    this.ctx.beginPath();
+                    this.ctx.arc(x, y, 0.8, 0, Math.PI * 2);
+                    this.ctx.fillStyle = this.color;
+                    this.ctx.globalAlpha = this.alpha * 0.8;
+                    this.ctx.fill();
+                }
+            }
+
+            drawConnections() {
+                this.nodeConnections.forEach(node => {
+                    const dx = this.x - node.x;
+                    const dy = this.y - node.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    if (distance < 200) {
+                        const opacity = 1 - distance / 200;
+                        this.ctx.beginPath();
+                        this.ctx.moveTo(this.x, this.y);
+                        this.ctx.lineTo(node.x, node.y);
+                        this.ctx.strokeStyle = this.color;
+                        this.ctx.globalAlpha = opacity * 0.15;
+                        this.ctx.lineWidth = 0.5;
+                        this.ctx.stroke();
+                    }
+                });
+            }
+
+            update(mouseX, mouseY) {
+                this.x += this.speedX;
+                this.y += this.speedY;
+
+                if (this.x > this.canvas.width)  this.x = 0;
+                if (this.x < 0)                  this.x = this.canvas.width;
+                if (this.y > this.canvas.height)  this.y = 0;
+                if (this.y < 0)                   this.y = this.canvas.height;
+
+                if (this.isNode) {
+                    this.size += this.pulseDirection * this.pulseSpeed;
+                    if (this.size > this.baseSize * 1.5 || this.size < this.baseSize * 0.8) {
+                        this.pulseDirection *= -1;
+                    }
+                    this.orbitAngle += this.orbitSpeed;
+                }
+
+                if (mouseX !== null && mouseY !== null) {
+                    const dx = mouseX - this.x;
+                    const dy = mouseY - this.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+
+                    if (distance < 120) {
+                        const force = (120 - distance) / 1500;
+                        this.speedX += dx > 0 ? force : -force;
+                        this.speedY += dy > 0 ? force : -force;
+                        this.alpha = Math.min(1, this.alpha + 0.05);
+                        if (!this.isNode) this.size = Math.min(this.baseSize * 2, this.size + 0.1);
+                    } else {
+                        this.alpha = Math.max(this.alpha - 0.01, this.isNode ? 0.4 : 0.2);
+                        if (!this.isNode) this.size = Math.max(this.baseSize, this.size - 0.05);
+                    }
+                }
+
+                this.speedX *= 0.99;
+                this.speedY *= 0.99;
+            }
+        }
+
+        class ParticleSystem {
+            constructor(canvasId) {
+                this.canvas = document.getElementById(canvasId);
+                this.ctx = this.canvas.getContext('2d');
+                this.particles = [];
+                this.mouseX = null;
+                this.mouseY = null;
+                this.resizeTimer = null;
+
+                this.resize();
+                this.createParticles();
+                this.connectNodes();
+                this.setupEventListeners();
+                this.animate();
+            }
+
+            resize() {
+                this.canvas.width  = window.innerWidth;
+                this.canvas.height = window.innerHeight;
+            }
+
+            createParticles() {
+                const total = Math.min(150, Math.floor((this.canvas.width * this.canvas.height) / 8000));
+                for (let i = 0; i < total; i++) {
+                    this.particles.push(new Particle(this.canvas, this.ctx));
+                }
+            }
+
+            connectNodes() {
+                const nodes = this.particles.filter(p => p.isNode);
+                nodes.forEach(node => {
+                    const count = 1 + Math.floor(Math.random() * 3);
+                    const others = nodes.filter(n => n !== node);
+                    for (let i = 0; i < Math.min(count, others.length); i++) {
+                        const idx = Math.floor(Math.random() * others.length);
+                        node.nodeConnections.push(others[idx]);
+                        others.splice(idx, 1);
+                    }
+                });
+            }
+
+            setupEventListeners() {
+                window.addEventListener('resize', () => {
+                    clearTimeout(this.resizeTimer);
+                    this.resizeTimer = setTimeout(() => this.resize(), 250);
+                });
+
+                document.addEventListener('mousemove', e => {
+                    this.mouseX = e.clientX;
+                    this.mouseY = e.clientY;
+                });
+
+                document.addEventListener('touchmove', e => {
+                    if (e.touches.length > 0) {
+                        this.mouseX = e.touches[0].clientX;
+                        this.mouseY = e.touches[0].clientY;
+                    }
+                });
+
+                document.addEventListener('mouseleave', () => { this.mouseX = null; this.mouseY = null; });
+                document.addEventListener('touchend',   () => { this.mouseX = null; this.mouseY = null; });
+            }
+
+            animate() {
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                this.particles.forEach(p => { p.update(this.mouseX, this.mouseY); p.draw(); });
+                this.particles = this.particles.filter(p => p.alpha > 0.05);
+                requestAnimationFrame(this.animate.bind(this));
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => new ParticleSystem('particleCanvas'));
+    </script>
+
+</body>
 </html>
