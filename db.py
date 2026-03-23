@@ -35,9 +35,6 @@ def init_db():
                )
 """)
     
-    db.execute("""
-               ALTER TABLE reports ADD COLUMN tx_signature TEXT DEFAULT NULL;)
-    """)
 
     db.execute("""
         CREATE TABLE IF NOT EXISTS admins (
