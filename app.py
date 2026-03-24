@@ -122,6 +122,7 @@ def logout():
 # ── Admin dashboard (protected) ───────────────────────────────────────────────
 
 @app.route("/admin")
+@login_required
 def admin():
     counts  = dbop.count_status()
     total   = dbop.total_reports()
@@ -139,6 +140,7 @@ def admin():
     )
 
 @app.route("/add-admin" , methods=["POST"])
+@login_required
 def add_admin():
     username = request.form.get("admin-username")
     name = request.form.get("admin-name")
@@ -155,6 +157,7 @@ def add_admin():
         })
 
 @app.route('/get-report', methods=['POST'])
+@login_required
 def get_report():
     tracking_id = request.form.get('tracking_id')
     private_key_file = request.files.get('private_key')
@@ -220,6 +223,7 @@ def get_report():
         return jsonify({'success': False, 'message': f'{type(e).__name__}: {str(e)}'})
 
 @app.route('/update-report', methods=['POST'])
+@login_required
 def update_report():
     tracking_id = request.form.get('tracking_id')
     status      = request.form.get('status')
