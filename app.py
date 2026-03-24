@@ -326,7 +326,7 @@ def submit_report():
     # 4. Encrypt & save
     phone = "918281959949"
     send_whatsapp_text(phone, f"A new report has been submitted with \n\ntracking ID: {tracking_id} \n\nsecret code:")
-
+    dbop.inr_admins()
     ciphertext, nonce, tag, enc_key = encrypt_report({
         "title":       title,
         "description": desc
