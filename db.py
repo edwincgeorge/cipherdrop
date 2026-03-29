@@ -10,6 +10,7 @@ def get_db():
             check_same_thread=False
         )
         g.db.row_factory = sqlite3.Row
+        g.db.execute("PRAGMA journal_mode=WAL")
     return g.db
 
 def close_db(e=None):
