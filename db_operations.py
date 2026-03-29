@@ -119,7 +119,7 @@ def inr_admins():
 
 # ── delete-admins ───────────────────────────────────────────────────
 
-def admin_delete(username):
+def delete_admin(username):
     db = get_db()
     db.execute("""
         DELETE FROM admins WHERE username = ? """, (username,))
