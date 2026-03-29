@@ -144,6 +144,9 @@ def add_admin():
 
     if not password:
         return jsonify({"success": False, "error": "Password is required"}), 400
+    
+    if dbop.get_admin(username):
+        return jsonify({"success": False, "message": "Username already exists"}), 400
 
     dbop.admin_management(username, name, email, position, generate_password_hash(password))
     return jsonify({
