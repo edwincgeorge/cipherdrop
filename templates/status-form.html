@@ -7,11 +7,8 @@
     <title>Ottikodukal</title>
 
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
@@ -47,21 +44,18 @@
             <small class="text-muted d-block mt-2">
                 Enter your Application ID and Secret Code to check the status of your report.
             </small>
-            <form id="status-report" enctype="multipart/form-data">
 
+            <form id="status-report" enctype="multipart/form-data">
 
                 <div class="mb-3 mt-4">
                     <label class="form-label">Application ID *</label>
-                    <input type="text" required class="form-control" id="titleInput" name="application_id" placeholder="Enter report title">
+                    <input type="text" required class="form-control" id="titleInput" name="application_id"
+                        placeholder="Enter report title">
                     <small id="wordCount" class="text-muted">0 / 100 words</small>
-                    <div class="invalid-feedback">
-                        Application ID is required.
-                    </div>
+                    <div class="invalid-feedback">Application ID is required.</div>
                 </div>
 
                 <div class="status-form-box mt-5">
-
-
                     <div class="d-flex align-items-center gap-2 mb-3">
                         <i class="bi bi-check-circle text-success"></i>
                         <span class="fw-medium">Status :</span>
@@ -70,17 +64,15 @@
 
                     <div class="lists mt-3">
                         <div class="fw-medium mb-2">Note :</div>
-
                         <div class="note-content">
                             <span class="text-muted" id="Note"></span>
                         </div>
-
                     </div>
                 </div>
+
                 <button type="submit" class="btn-hp w-100 mt-4" style="border-color: #aaa9a9;">
                     Check Status
                 </button>
-
 
             </form>
 
@@ -89,72 +81,22 @@
                     <i class="bi bi-shield-lock" style="color: green;"></i>
                     <p class="mb-0">Security Features</p>
                 </div>
-                <div class="feature-item">
-                    <span class="tick">✓</span>
-                    AES-256 client-side encryption — data encrypted before leaving your browser
-                </div>
-
-                <div class="feature-item">
-                    <span class="tick">✓</span>
-                    SHA-256 hashing for integrity verification
-                </div>
-
-                <div class="feature-item">
-                    <span class="tick">✓</span>
-                    Blockchain timestamp for immutable proof of submission
-                </div>
-
-                <div class="feature-item">
-                    <span class="tick">✓</span>
-                    Completely anonymous — no personal identification required
-                </div>
-
-                <div class="feature-item">
-                    <span class="tick">✓</span>
-                    Auto-generated secret code for secure tracking
-                </div>
+                <div class="feature-item"><span class="tick">✓</span> AES-256 client-side encryption — data encrypted before leaving your browser</div>
+                <div class="feature-item"><span class="tick">✓</span> SHA-256 hashing for integrity verification</div>
+                <div class="feature-item"><span class="tick">✓</span> Blockchain timestamp for immutable proof of submission</div>
+                <div class="feature-item"><span class="tick">✓</span> Completely anonymous — no personal identification required</div>
+                <div class="feature-item"><span class="tick">✓</span> Auto-generated secret code for secure tracking</div>
             </div>
+        </div>
     </section>
-    </div>
 
-    </div>
-    </section>
     <footer class="footer text-center py-4">
         <div class="container">
-            <p class="mb-0 footer-text">
-                Developed by G13
-            </p>
+            <p class="mb-0 footer-text">Developed by G13</p>
         </div>
     </footer>
 
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-
-            const form = document.getElementById("status-report");
-            if (!form) return;
-
-            form.addEventListener("submit", function (e) {
-                e.preventDefault();
-
-                let formData = new FormData(form);
-
-                fetch("/status-reports", {
-                    method: "POST",
-                    body: formData
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            document.getElementById("status-badge").innerText = data.status;
-                            document.getElementById("Note").innerText = data.note;
-
-                        }
-                    });
-            });
-
-        });
-    </script>
-    
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 </body>
 
 </html>
