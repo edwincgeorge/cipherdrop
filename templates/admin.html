@@ -69,7 +69,7 @@
                         <li>
                             <hr class="dropdown-divider">
                         </li>
-                        <li><a class="dropdown-item text-danger" href="{{ url_for('logout') }}">Logout</a></li>
+                        <li><a class="dropdown-item text-danger" href="#">Logout</a></li>
                         <!-- Download Backup also shown here on mobile -->
                         <li class="d-block d-sm-none"><a class="dropdown-item" href="#">Download Backup</a></li>
                     </ul>
@@ -573,24 +573,6 @@
                         }
                     });
             });
-
-            // ── Add admin form ────────────────────────────────────────────────────
-            const form = document.getElementById("admin-form");
-            if (form) {
-                form.addEventListener("submit", function (e) {
-                    e.preventDefault();
-                    fetch("/add-admin", { method: "POST", body: new FormData(form) })
-                        .then(r => r.json())
-                        .then(data => {
-                            if (data.success) {
-                                alert("Admin added successfully");
-                                form.reset();
-                            } else {
-                                alert("Error: " + data.message);
-                            }
-                        });
-                });
-            }
 
         });
 
