@@ -136,16 +136,18 @@ def admin():
 @app.route("/add-admin" , methods=["POST"])
 @login_required
 def add_admin():
-    username = request.form.get("admin-username")
+    username = request.form.get("admin-username", "").strip()
     name = request.form.get("admin-name")
     email = request.form.get("admin-email")
     position = request.form.get("admin-position")
     password = request.form.get("admin-password")
 
+    if dbop.get_admin(username):
+        return jsonify({"success": False, "message": "Username already exists"}), 400
     if not password:
-      return jsonify({"success": False, "error": "Password is required"}), 400
+        return jsonify({"success": False, "error": "Password is required"}), 400
 
-    dbop.admin_management(username, name, email, position, password)
+    dbop.admin_management(username, name, email, position, generate_password_hash(password))
     return jsonify({
             "success": True
         })
