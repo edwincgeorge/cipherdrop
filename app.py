@@ -142,8 +142,6 @@ def add_admin():
     position = request.form.get("admin-position")
     password = request.form.get("admin-password")
 
-    if dbop.get_admin(username):
-        return jsonify({"success": False, "message": "Username already exists"}), 400
     if not password:
         return jsonify({"success": False, "error": "Password is required"}), 400
 
