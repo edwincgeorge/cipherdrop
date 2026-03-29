@@ -46,16 +46,6 @@ rsa_cipher = PKCS1_OAEP.new(public_key)
 with app.app_context():
     init_db()
 
-@app.teardown_appcontext
-def close_db(exception):
-    db = g.pop("db", None)
-    if db is not None:
-        db.close()
-
-@app.before_first_request
-def init_db():
-    db = get_db()
-    db.execute("PRAGMA journal_mode=WAL;")
 # ── Auth decorator ────────────────────────────────────────────────────────────
 
 def login_required(f):
