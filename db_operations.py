@@ -102,21 +102,6 @@ def show_admins():
         "SELECT username, name, email, position FROM admins"
     ).fetchall()
 
-
-def inr_admins():
-    db = get_db()
-    return db.execute("""
-    INSERT OR IGNORE INTO admins (username, name, email, position, password_hash)
-    VALUES (?, ?, ?, ?, ?)
-""", (
-    "admin",
-    "Super Admin", 
-    "admin@cipherdrop.com",
-    "superadmin",
-    generate_password_hash("changeme123")
-))
-
-
 # ── delete-admins ───────────────────────────────────────────────────
 
 def delete_admin(username):
