@@ -162,51 +162,29 @@ def get_report():
     tracking_id = request.form.get('tracking_id')
     private_key_file = request.files.get('private_key')
 
-    print(f"=== GET REPORT ===")
-    print(f"tracking_id: {tracking_id}")
-    print(f"private_key_file: {private_key_file}")
 
     if not private_key_file:
         return jsonify({'success': False, 'message': 'No private key uploaded'})
 
     report = dbop.get_report_by_id(tracking_id)
-    print(f"report found: {report is not None}")
 
     if not report:
         return jsonify({'success': False, 'message': 'Report not found'})
 
     report = dict(report)
-    print(f"report keys: {list(report.keys())}")  # ← shows actual column names
 
     try:
         private_key_data = private_key_file.read()
-        print(f"key size: {len(private_key_data)} bytes")
-
         private_key = RSA.import_key(private_key_data)
-        print("✅ RSA key loaded")
-
         rsa_decipher = PKCS1_OAEP.new(private_key)
-
         enc_key    = base64.b64decode(report['enc_key'])
-        print("✅ enc_key decoded")
-
         ciphertext = base64.b64decode(report['encryptedtext'])
-        print("✅ ciphertext decoded")
-
         nonce      = base64.b64decode(report['nonce'])
         tag        = base64.b64decode(report['tag'])
-        print("✅ nonce and tag decoded")
-
         report_key = rsa_decipher.decrypt(enc_key)
-        print("✅ RSA decrypt done")
-
         cipher = AES.new(report_key, AES.MODE_GCM, nonce=nonce)
         plaintext = cipher.decrypt_and_verify(ciphertext, tag)
-        print("✅ AES decrypt done")
-
         data = json.loads(plaintext.decode())
-        print(f"✅ JSON parsed: {list(data.keys())}")
-
         return jsonify({
             'success': True,
             'title':       data.get('title', 'N/A'),
@@ -217,9 +195,8 @@ def get_report():
         })
 
     except Exception as e:
-        print(f"❌ ERROR at: {type(e).__name__}: {e}")
         import traceback
-        traceback.print_exc()  # ← full stack trace
+        traceback.print_exc()
         return jsonify({'success': False, 'message': f'{type(e).__name__}: {str(e)}'})
 
 @app.route('/update-report', methods=['POST'])
@@ -232,6 +209,14 @@ def update_report():
     dbop.update_report_status(tracking_id, status, note)
     return jsonify({'success': True})
 
+@app.route("/delete-admin", methods=["POST"])
+@login_required
+def delete_admin():
+    username = request.form.get("username")
+    if username == session.get("admin_username"):
+        return jsonify({"success": False, "message": "Cannot delete yourself"})
+    dbop.delete_admin(username)
+    return jsonify({"success": True})
 # ── Debug route (remove in production) ───────────────────────────────────────
 
 @app.route("/check-db")
