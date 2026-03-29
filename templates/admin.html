@@ -278,7 +278,8 @@
                         <div class="col text-muted">{{admin.position}}</div>
                         <!-- Delete button to remove admin (functionality not yet wired) -->
                         <div class="col text-end">
-                            <button class="btn btn-sm btn-light border">delete</button>
+                            <button class="btn btn-sm btn-light border delete-admin-btn"
+                                data-username="{{ admin.username }}">delete</button>
                         </div>
                     </div>
                     {% endfor %}
@@ -591,7 +592,29 @@
                 });
             }
 
-        }); 
+        });
+
+        document.querySelectorAll('.delete-admin-btn').forEach(btn => {
+            btn.addEventListener('click', function () {
+                const username = this.dataset.username;
+                if (!confirm(`Delete admin "${username}"?`)) return;
+
+                fetch('/delete-admin', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: `username=${encodeURIComponent(username)}`
+                })
+                    .then(r => r.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert('Admin deleted');
+                            location.reload();
+                        } else {
+                            alert('Error: ' + data.message);
+                        }
+                    });
+            });
+        });
     </script>
 
 </body>
