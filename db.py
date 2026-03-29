@@ -50,4 +50,10 @@ def init_db():
         )
     """)
 
-    db.commit
+    db.commit()
+    db.execute("""
+        INSERT OR IGNORE INTO admins (username, name, email, position, password_hash)
+        VALUES (?, ?, ?, ?, ?)
+    """, ("admin", "Super Admin", "admin@cipherdrop.com", "superadmin",
+          generate_password_hash("changeme123")))
+    db.commit()
