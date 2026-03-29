@@ -113,11 +113,6 @@ def login_submit():
     return jsonify({"success": True, "redirect": "/admin"})
 
 
-@app.route("/logout")
-def logout():
-    session.clear()
-    return redirect(url_for("login_page"))
-
 
 # ── Admin dashboard (protected) ───────────────────────────────────────────────
 
