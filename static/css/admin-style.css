@@ -1,44 +1,9 @@
-#loader {
-    position: fixed;
-    inset: 0;
-    background: #000;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 9999;
-}
-
-.g13 {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 10vw;
-    font-weight: 900;
-    color: #fff;
-    position: relative;
-    letter-spacing: 6px;
-    animation: 1.5s infinite alternate;
-}
-
-.g13::before {
-    content: "G13";
-    position: absolute;
-    inset: 0;
-    color: #fff;
-    filter: blur(12px);
-    opacity: 0.5;
-}
-
-.hide-loader {
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.6s ease, visibility 0.6s ease;
-}
-
+/* ── NAV ────────────────────────────────────────────────────────────────── */
 .nav-btn {
     background-color: rgb(223, 221, 221);
     border: none;
     border-radius: 5px;
     height: 31px;
-
 }
 
 .nav-btn:hover {
@@ -46,6 +11,8 @@
     color: white;
 }
 
+
+/* ── REPORT SUMMARY CARDS ───────────────────────────────────────────────── */
 .report-cards {
     padding: 0px 50px;
 }
@@ -55,21 +22,21 @@
     border: 2px solid #dcdcdc;
     border-radius: 18px;
     background-color: #fff;
-
     display: flex;
     flex-direction: column;
 }
 
-.form-box>.d-flex {
+.form-box > .d-flex {
     width: 100%;
 }
 
+
+/* ── REPORT DATA BOX & TABLE ────────────────────────────────────────────── */
 .report-data-box {
     padding: 15px;
     border: 2px solid #dcdcdc;
     border-radius: 18px;
     background-color: #fff;
-
     display: flex;
     flex-direction: column;
 }
@@ -78,6 +45,8 @@
     background-color: #eee9e9;
 }
 
+
+/* ── CHARTS ─────────────────────────────────────────────────────────────── */
 .ReportsChart {
     height: 250px;
 }
@@ -86,10 +55,11 @@
     padding: 0px 60px;
 }
 
+
+/* ── BUTTONS ────────────────────────────────────────────────────────────── */
 .decrypt-btn {
     border-radius: 5px;
     height: 40px;
-
 }
 
 .decrypt-btn:hover {
@@ -124,6 +94,8 @@
     transform: scale(0.98);
 }
 
+
+/* ── FOOTER ─────────────────────────────────────────────────────────────── */
 .footer {
     border-top: 1px solid #e0e0e0;
     margin-top: 150px;
