@@ -217,6 +217,11 @@ def delete_admin():
         return jsonify({"success": False, "message": "Cannot delete yourself"})
     dbop.delete_admin(username)
     return jsonify({"success": True})
+
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect(url_for("login_page"))
 # ── Debug route (remove in production) ───────────────────────────────────────
 
 @app.route("/check-db")
