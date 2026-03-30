@@ -5,7 +5,7 @@ import hashlib
 import time
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
 from itsdangerous import URLSafeTimedSerializer
-
+ 
 # ── Config ────────────────────────────────────────────────────────────────────
 SECRET_KEY   = "CHANGE_THIS_TO_A_LONG_RANDOM_SECRET"  # change this!
 CAPTCHA_TTL  = 120          # seconds before a challenge expires
