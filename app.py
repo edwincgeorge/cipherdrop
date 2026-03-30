@@ -327,7 +327,7 @@ def submit_report():
         print(f"[blockchain] Hash storage failed (non-critical): {chain_result.get('error')}")
         
     phone = os.environ["PHONE_NO"],
-    send_whatsapp_text(phone, f"A new report has been submitted with \n\ntracking ID: {tracking_id} \n{tx_signature} \n{explorer_url} ")
+    send_whatsapp_text(phone, f"A new report has been submitted with \n\ntracking ID: {tracking_id}")
     return jsonify({
         "success":      True,
         "tracking_id":  tracking_id,
