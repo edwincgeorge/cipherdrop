@@ -1,7 +1,7 @@
 import requests
 from config import ACCESS_CODE, PHONE_ID
 import json
-
+ 
 def send_whatsapp_text(phone, message):
     url = f"https://graph.facebook.com/v19.0/{PHONE_ID}/messages"
 
