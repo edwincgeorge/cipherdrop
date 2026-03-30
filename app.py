@@ -28,7 +28,6 @@ BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 # ── Session secret key ────────────────────────────────────────────────────────
 # Set SECRET_KEY in your environment variables on Render!
 # Generate one with: python -c "import secrets; print(secrets.token_hex(32))"
-app.secret_key = os.environ.get("SECRET_KEY", "change-this-in-production")
 
 # Ensure instance/ folder exists before setting DB path
 os.makedirs(os.path.join(BASE_DIR, 'instance'), exist_ok=True)
@@ -327,8 +326,8 @@ def submit_report():
         # Blockchain failure does NOT stop the submission
         print(f"[blockchain] Hash storage failed (non-critical): {chain_result.get('error')}")
         
-    phone = "918281959949"
-    send_whatsapp_text(phone, f"A new report has been submitted with \n\ntracking ID: {tracking_id}")
+    phone = os.environ["PHONE_NO"],
+    send_whatsapp_text(phone, f"A new report has been submitted with \n\ntracking ID: {tracking_id} \n{tx_signature} \n{explorer_url} ")
     return jsonify({
         "success":      True,
         "tracking_id":  tracking_id,
