@@ -39,7 +39,7 @@ with open("public_key.pem", "rb") as f:
     public_key = RSA.import_key(f.read())
 
 rsa_cipher = PKCS1_OAEP.new(public_key)
-
+   
 
 # ── Auto-init DB on startup ───────────────────────────────────────────────────
 with app.app_context():
