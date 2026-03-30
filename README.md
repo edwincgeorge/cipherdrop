@@ -98,8 +98,11 @@ SECRET_KEY=your_flask_secret_key
 CLOUDINARY_CLOUD_NAME=your_cloud_name
 CLOUDINARY_API_KEY=your_api_key
 CLOUDINARY_API_SECRET=your_api_secret
+ACCESS_CODE=your_whatsapp_access_code
 PHONE_NO=your_whatsapp_number
+PHONE_ID=whatsapp_number_id
 VERIFY_TOKEN=your_webhook_verify_token
+SOLANA_KEYPAIR_PATH=your_solana_keypair_path
 ```
 
 Generate a secure Flask secret key with:
