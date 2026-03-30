@@ -1,7 +1,7 @@
 import sqlite3
 from werkzeug.security import generate_password_hash
 from flask import current_app, g
-
+ 
 def get_db():
     if 'db' not in g:
         g.db = sqlite3.connect(
