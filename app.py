@@ -28,7 +28,7 @@ BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 # ── Session secret key ────────────────────────────────────────────────────────
 # Set SECRET_KEY in your environment variables on Render!
 # Generate one with: python -c "import secrets; print(secrets.token_hex(32))"
-
+app.secret_key = os.environ.get("SECRET_KEY", "change-this-in-production")
 # Ensure instance/ folder exists before setting DB path
 os.makedirs(os.path.join(BASE_DIR, 'instance'), exist_ok=True)
 
